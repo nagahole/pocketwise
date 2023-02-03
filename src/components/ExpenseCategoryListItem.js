@@ -4,15 +4,15 @@ import { AspectRatio, Box, Center, HStack, Text, VStack } from "native-base";
 import { useContext } from "react";
 import { TouchableOpacity } from "react-native";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
-import { CategoriesContext } from "../stacks/MainAppStack";
+import { DataContext } from "../stacks/MainAppStack";
 
 export default function ExpenseCategoryListItem({
   categoryID, amount, iconSize=22, numberOfTransactions, percentageOfTotal
 }) {
 
-  const userGeneratedCategories = useContext(CategoriesContext);
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data();
 
-  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories.find(x => x.id === categoryID);
+  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories[categoryID];
 
   return (
     <TouchableOpacity>
@@ -20,7 +20,7 @@ export default function ExpenseCategoryListItem({
         shadowRadius: 20,
         shadowOpacity: 0.08,
         shadowOffset: { width: -10, height: 10 },
-        height: 75
+        height: 70
       }}>
         <HStack w="100%" space={3} alignItems="center" p="2.5">
           <AspectRatio ratio={1} h="100%">

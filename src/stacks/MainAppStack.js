@@ -4,48 +4,51 @@ import AddTransactionScreen from "../screens/AddTransactionScreen";
 import AddBudgetScreen from "../screens/AddBudgetScreen";
 import CreateCategoryScreen from "../screens/CreateCategoryScreen";
 import DetailedAnalyticsScreen from "../screens/DetailedAnalyticsScreen";
-import firebase from "firebase/compat/app";
 import auth from '@react-native-firebase/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollection, useCollectionData } from 'react-firebase-hooks/firestore';
 import { db } from "../firebase";
 import { createContext } from "react";
-
+import { RECENT_TRANSACTIONS_TO_SHOW } from "../data/Constants";
 
 const Stack = createNativeStackNavigator();
 
-export const ThisMonthsTransactionsContext = createContext([]);
-export const CategoriesContext = createContext([]);
+export const RecentTransactionsContext = createContext([]);
+export const DataContext = createContext({});
 
-let startOfTheMonth = new Date();
+export const startOfTheMonth = new Date();
 startOfTheMonth.setDate(0);
-startOfTheMonth = startOfTheMonth.getTime();
-
-export const transactionsRef = db
-  .collection('users')
-  .doc(auth().currentUser.uid)
-  .collection('transactions');
 
 export default function MainAppStack() {
 
-  const categoriesRef = db
+  transactionsRef = db
     .collection('users')
     .doc(auth().currentUser.uid)
-    .collection('categories');
+    .collection('transactions');
 
-  const transactionsQuery = transactionsRef.where("date", ">=", startOfTheMonth).orderBy('date', 'desc');
+  const transactionsQuery = transactionsRef.where("date", ">=", startOfTheMonth.getTime()).orderBy('date', 'desc');
   const [transactions] = useCollectionData(transactionsQuery, {idField: 'id'});
 
-  const categoriesQuery = categoriesRef;//.orderBy("name", "asc");
-  const [categories] = useCollectionData(categoriesQuery, {idField: "id"});
+  const transactionsBeforeStartOfTheMonthQuery = 
+    transactionsRef
+      .where("date", "<", startOfTheMonth)
+      .orderBy('date', "desc")
+      .limit(RECENT_TRANSACTIONS_TO_SHOW);
+    
+  const [transactionsBeforeStartOfTheMonth] = useCollectionData(transactionsBeforeStartOfTheMonthQuery, {idField: "id"});
 
-  if (transactions == undefined || categories == undefined)
+
+  const dataQuery = db.collection('users').doc(auth().currentUser.uid).collection('data');
+  const [dataCollection] = useCollection(dataQuery, {idField: 'id'});
+
+
+  if (transactions == undefined 
+    || transactionsBeforeStartOfTheMonth == undefined 
+    || dataCollection == undefined)
     return null;
 
-  console.log(categories[0].id);
-
   return (
-    <CategoriesContext.Provider value={categories}>
-    <ThisMonthsTransactionsContext.Provider value={transactions}>
+    <DataContext.Provider value={dataCollection}>
+    <RecentTransactionsContext.Provider value={transactions}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Main Tab" component={MainAppTabScreen}/> 
         <Stack.Screen name="Add Transaction" component={AddTransactionScreen}/>
@@ -53,7 +56,7 @@ export default function MainAppStack() {
         <Stack.Screen name="Create Category" component={CreateCategoryScreen}/>
         <Stack.Screen name="Detailed Analytics" component={DetailedAnalyticsScreen}/> 
       </Stack.Navigator>
-    </ThisMonthsTransactionsContext.Provider>
-    </CategoriesContext.Provider>
+    </RecentTransactionsContext.Provider>
+    </DataContext.Provider>
   )
 }

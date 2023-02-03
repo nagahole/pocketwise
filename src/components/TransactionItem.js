@@ -4,13 +4,13 @@ import chroma from "chroma-js";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import { lighten, transparentize } from "color2k";
 import { useContext } from "react";
-import { CategoriesContext } from "../stacks/MainAppStack";
+import { DataContext } from "../stacks/MainAppStack";
 
 export default function TransactionItem({ reference, categoryID, amount, type, iconSize=22 }) {
 
-  const userGeneratedCategories = useContext(CategoriesContext);
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
 
-  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories.find(x => x.id === categoryID);
+  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories[categoryID];
 
   return (
     <Box

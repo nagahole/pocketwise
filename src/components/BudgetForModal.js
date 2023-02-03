@@ -1,17 +1,27 @@
 import { Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AspectRatio, Box, Center, Checkbox, FlatList, HStack, Text } from 'native-base';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { EXPENSE_CATEGORIES } from '../screens/AddBudgetScreen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import DEFAULT_CATEGORIES from '../data/DefaultCategories';
+import { transparentize } from 'color2k';
+import { DataContext } from '../stacks/MainAppStack';
 
-export default function BudgetForModal({visible, closeModal, modalHeight = 400}) {
+export default function BudgetForModal({visible, closeModal, modalHeight = 400, selectCategory}) {
 
   const insets = useSafeAreaInsets();
 
   const backgroundOpacity = useSharedValue(0);
   const yOffset = useSharedValue(modalHeight);
+
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data()?? {};
+  const outlays = useContext(DataContext).docs.find(x => x.id === "outlays")?.data()?? {};
+
+  const allUnaddedExpenseCategories = 
+    Object.values(DEFAULT_CATEGORIES).filter(x => x.type === "expenses")
+      .concat(Object.values(userGeneratedCategories).filter(x => x.type === "expenses"))
+      .filter(c => !outlays.hasOwnProperty(c.id));
 
   const opacityStyle = useAnimatedStyle(() => {
     return {
@@ -49,6 +59,11 @@ export default function BudgetForModal({visible, closeModal, modalHeight = 400})
     setTimeout(() => closeModal(), 500);
   }
 
+  function handleItemPressed(item) {
+    selectCategory(item);
+    playExitAnimation();
+  }
+
   return (
     <Modal
       visible={visible}
@@ -74,32 +89,32 @@ export default function BudgetForModal({visible, closeModal, modalHeight = 400})
       >
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={EXPENSE_CATEGORIES}
+          data={allUnaddedExpenseCategories}
           contentContainerStyle={{
             paddingHorizontal: 12,
             paddingTop: 30,
             paddingBottom: insets.bottom + 20
           }}
           renderItem={({item}) => (
-            <HStack 
-              alignItems="center" 
-              key={item.label} 
-              w="100%" 
-              borderColor="#E9E9EA" 
-              borderWidth={2} 
-              p="1.5" 
-              rounded={15} 
-              mb="2.5"
-              justifyContent="space-between"
-            >
-              <HStack alignItems="center" space={3}>
-                <Center h="12" w="12" bg="#E2FFE8" rounded={12}>
-                  <FontAwesomeIcon icon={item.iconName} color="#53D062" size={20}/>
+            <TouchableOpacity onPress={() => handleItemPressed(item)}>
+              <HStack 
+                alignItems="center" 
+                key={item.label} 
+                w="100%" 
+                borderColor="#E9E9EA" 
+                borderWidth={2} 
+                py="2" 
+                px="2.5"
+                rounded={15} 
+                mb="2.5"
+                space={3}
+              >
+                <Center h="12" w="12" bg={transparentize(item.color, 0.85)} rounded={12}>
+                  <FontAwesomeIcon icon={item.icon} color={item.color} size={20}/>
                 </Center>
-                <Text fontWeight="600" fontSize={15}>{item.label}</Text>
+                <Text fontWeight="600" fontSize={15}>{item.name.capitalize()}</Text>
               </HStack>
-              <Checkbox mr="3" rounded={100} size="md" aria-label={item.label}/>
-            </HStack>
+            </TouchableOpacity>
           )}
         />
       </Animated.View>

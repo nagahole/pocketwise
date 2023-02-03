@@ -1,0 +1,1 @@
+export const RECENT_TRANSACTIONS_TO_SHOW = 5;

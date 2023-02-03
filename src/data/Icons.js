@@ -1,6 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faEyeSlash, faHeart } from '@fortawesome/free-regular-svg-icons';
-import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faUser } from '@fortawesome/free-solid-svg-icons';
 
 library.add( 
   faBagShopping, faEllipsis, faBars, faPlus, faChevronRight, faDollarSign, faCalendarDays,
@@ -8,7 +8,7 @@ library.add(
   faHeart, faFileInvoice, faFileInvoiceDollar, faGift, faLaptop, faPencil, faEye,
   faEyeSlash, faArrowTrendUp, faArrowRightArrowLeft, faMoneyBillTrendUp, faMoneyBillTransfer,
   faHandHoldingDollar, faLandmark, faMoneyBills, faMoneyCheckDollar, faCommentsDollar,
-  faHospital, faHouse, faUser, faEnvelope, faClipboard, faBarcode
+  faHospital, faHouse, faUser, faEnvelope, faClipboard, faBarcode, faChevronDown
 );
 
 const ICONS = [

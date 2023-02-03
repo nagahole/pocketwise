@@ -5,10 +5,10 @@ import { SWITCH_OPTIONS } from "./AddTransactionScreen";
 import { VictoryChart, VictoryLabel, VictoryPie } from "victory-native";
 import { Dimensions, TouchableOpacity } from "react-native";
 import Svg from "react-native-svg";
-import { EXPENSE_CATEGORIES } from "./AddBudgetScreen";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { FAKERECENTTRANSACTIONSDATA } from "./HomeScreen";
 import TransactionItem from "../components/TransactionItem";
+import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 
 export default function DetailedAnalyticsScreen({navigation}) {
   
@@ -114,7 +114,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
               </Box>
               <Box flexDir="row" flexWrap="wrap" mt="3">
                 {
-                  EXPENSE_CATEGORIES.map(({label}) => (
+                  Object.values(DEFAULT_CATEGORIES).map(({label}) => (
                     <Circle borderColor="#E4E3E3" borderWidth={1} py="0.5" px="2" mb="2" mr="2" key={label}>
                       <HStack space={1} alignItems="center">
                         <Circle w="3" h="3" bg="red.300"/>

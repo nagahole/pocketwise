@@ -10,6 +10,7 @@ import { useState } from "react";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { transparentize } from "color2k";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function CreateCategoryScreen({navigation}) {
 
@@ -27,11 +28,6 @@ export default function CreateCategoryScreen({navigation}) {
       return;
     }
 
-    if (outlay === "") {
-      Alert.alert("Please set an outlay");
-      return;
-    }
-
     if (selectedIcon == undefined) {
       Alert.alert("Please select an icon");
       return;
@@ -44,36 +40,47 @@ export default function CreateCategoryScreen({navigation}) {
 
     setButtonEnabled(false);
 
+    let id = uuidv4();
+
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
-      .collection("categories")
-      .add({
-        type,
-        name,
-        outlay: parseFloat(outlay),
-        icon: selectedIcon,
-        color: selectedColor
-      })
-      .then(docRef => {
+      .collection("data")
+      .doc("categories")
+      .set({
+        [id]: {
+          type,
+          name,
+          icon: selectedIcon,
+          color: selectedColor,
+          id
+        }
+      }, {merge: true})
+      .then(() => {
 
         setButtonEnabled(true);
         navigation.goBack();
 
-        firestore()
-          .collection('users')
-          .doc(auth().currentUser.uid)
-          .collection("categories")
-          .doc(docRef.id)
-          .update({
-            id: docRef.id
-          })
-          .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message))
       })
       .catch(error => {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
       });
+
+    if (outlay === "")
+      return;
+
+    //No need to add outlay object if user didn't specify outlay
+
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("outlays")
+      .set({
+        [id]: parseFloat(outlay)
+      }, {merge: true})
+      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
   }
  
   return (

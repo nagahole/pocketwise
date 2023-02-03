@@ -11,7 +11,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SimpleGrid } from "react-native-super-grid";
 import ExpenseCategoryGridItem from "../components/ExpenseCategoryGridItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
-import { CategoriesContext } from "../stacks/MainAppStack";
+import { DataContext } from "../stacks/MainAppStack";
+import { transparentize } from "color2k";
 
 export const SWITCH_OPTIONS = [
   { label: "Expenses", value: "expenses" },
@@ -21,8 +22,9 @@ export const SWITCH_OPTIONS = [
 
 export default function AddTransactionScreen({navigation}) {
 
-  const userGeneratedCategories = useContext(CategoriesContext);
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
 
+  //#region setting up categories
   const EXPENSE_CATEGORIES = 
     Object
       .values(DEFAULT_CATEGORIES)
@@ -56,7 +58,7 @@ export default function AddTransactionScreen({navigation}) {
         color: c.color
       }));
 
-  userGeneratedCategories.forEach(c => {
+  Object.values(userGeneratedCategories).forEach(c => {
 
     if (c.type === "expenses") {
       EXPENSE_CATEGORIES.unshift({
@@ -113,6 +115,8 @@ export default function AddTransactionScreen({navigation}) {
     }
   });
 
+  //#endregion
+
   const [type, setType] = useState("expenses");
 
   const [reference, setReference] = useState("");
@@ -122,6 +126,8 @@ export default function AddTransactionScreen({navigation}) {
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [date, setDate] = useState("today");
+
+  const [buttonEnabled, setButtonEnabled] = useState(true);
 
   function handleAddTransaction() {
 
@@ -140,6 +146,8 @@ export default function AddTransactionScreen({navigation}) {
       return;
     }
 
+    setButtonEnabled(false);
+
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
@@ -157,6 +165,10 @@ export default function AddTransactionScreen({navigation}) {
           : new Date(date).getTime()
       })
       .then(docRef => {
+
+        setButtonEnabled(true);
+        navigation.goBack();
+
         firestore()
           .collection('users')
           .doc(auth().currentUser.uid)
@@ -168,8 +180,6 @@ export default function AddTransactionScreen({navigation}) {
           .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message))
       })
       .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
-
-    navigation.goBack();
   }
 
   function showDatePicker() {
@@ -372,7 +382,7 @@ export default function AddTransactionScreen({navigation}) {
           </HStack>
 
           <Box style={{ height: 55 }}>
-            <Button w="100%" h="100%" rounded={100} bg="#333333" _pressed={{ backgroundColor: 'black' }} onPress={handleAddTransaction}>
+            <Button disabled={!buttonEnabled} w="100%" h="100%" rounded={100} bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} _pressed={{ backgroundColor: 'black' }} onPress={handleAddTransaction}>
               <Text color="white" fontWeight="500" fontSize={16}>ADD TRANSACTION</Text>
             </Button>
           </Box>

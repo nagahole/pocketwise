@@ -8,10 +8,12 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { faker } from '@faker-js/faker';
 import TransactionItem from '../components/TransactionItem';
 import { Alert, Animated, Dimensions } from 'react-native';
-import { ThisMonthsTransactionsContext, transactionsRef } from '../stacks/MainAppStack';
+import { DataContext, RecentTransactionsContext, startOfTheMonth, transactionsRef } from '../stacks/MainAppStack';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
+import { RECENT_TRANSACTIONS_TO_SHOW } from '../data/Constants';
+import DEFAULT_CATEGORIES from '../data/DefaultCategories';
 
 //#region fake data
 export const FAKEBUDGETDETAILSDATA = [
@@ -59,18 +61,49 @@ export const FAKEBUDGETDETAILSDATA = [
 
 //#endregion
 
-const RECENT_TRANSACTIONS_TO_SHOW = 5;
-
 export default function HomeScreen({navigation}) {
   const insets = useSafeAreaInsets();
 
   const nScroll = new Animated.Value(0);
 
-  const thisMonthsTransactions = useContext(ThisMonthsTransactionsContext);
+  const recentTransactions = useContext(RecentTransactionsContext);
 
-  const query = transactionsRef.orderBy("date", "desc").limit(RECENT_TRANSACTIONS_TO_SHOW);
+  const dataCollection = useContext(DataContext);
 
-  const [recentTransactions] = useCollectionData(query, {idField: "id"});
+  const rawOutlaysObject = dataCollection.docs.find(x => x.id === "outlays")?.data()?? {};
+
+  let expenseOutlaysArr = [];
+
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+
+  for (let key in rawOutlaysObject) {
+
+    const category = DEFAULT_CATEGORIES[key]?? userGeneratedCategories[key];
+
+    if (category.type !== "expenses")
+      continue;
+
+    expenseOutlaysArr.push({
+      id: key,
+      outlay: rawOutlaysObject[key]
+    })
+  }
+
+  const transactionsThisMonth = useContext(RecentTransactionsContext).filter(t => t.date >= startOfTheMonth.getTime());
+
+  const groupedTransactions = transactionsThisMonth.reduce((acc, t) => {
+    (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
+
+    return acc;
+  }, {});
+
+  expenseOutlaysArr.sort((a, b) => { 
+    //Sorted by budget per month
+    return (
+      - a.outlay
+      + b.outlay
+    )
+  });
 
   return (
     <Box 
@@ -105,17 +138,17 @@ export default function HomeScreen({navigation}) {
             </HStack>
           </Box>
           <Box flex={3.6}>
-            <VStack w="100%" h="100%" px="8" pt="2">
+            <VStack w="100%" h="100%" px="8" style={{ paddingTop: 25 }}>
               <HStack space={2}>
-                <Text color="white" fontSize="36">$ 460.50</Text>
+                <Text color="white" fontSize="40">$ {transactionsThisMonth.reduce((acc, t) => acc + t.amount, 0).toFixed(2)}</Text>
                 {/* <Box justifyContent="center">
                   <Box bg="#6EB6FF" rounded={100} px="2.5">
                     <Text color="white" fontWeight="600">+8%</Text>
                   </Box>
                 </Box> */}
               </HStack>
-              <Text color="white" fontSize="16" mt="1">Spent out of a $1,000 budget</Text>
-              <Box flex={1} justifyContent="center" mb="1.5">
+              <Text color="white" fontSize="16" mt="1">Spent out of a ${Math.round(expenseOutlaysArr.reduce((acc, e) => acc + e.outlay, 0))} budget</Text>
+              {/* <Box flex={1} justifyContent="center" mb="1.5">
                 <Button
                   bg="#FED9DA"
                   _pressed={{
@@ -131,17 +164,17 @@ export default function HomeScreen({navigation}) {
                     <Text color="#853B8A" fontSize={16} fontWeight="600">Edit budget</Text>
                   </HStack>
                 </Button>
-              </Box>
+              </Box> */}
             </VStack>
           </Box>
         </Box>
       </Box>
 
       {/* This box is the bottom half of the screen */}
-      <Box flex={1.5}>
+      <Box flex={2.2}>
         <Animated.FlatList
-          data={recentTransactions?? thisMonthsTransactions?.slice(0, Math.min(thisMonthsTransactions.length, RECENT_TRANSACTIONS_TO_SHOW))}
-          renderItem={({item}) => <TransactionItem {...item} />}
+          data={recentTransactions.slice(0, Math.min(recentTransactions.length, RECENT_TRANSACTIONS_TO_SHOW))}
+          renderItem={({item}) => <TransactionItem {...item} /> }
           keyExtractor={item => item.id}
           onScroll={Animated.event([{
             nativeEvent: {
@@ -172,7 +205,7 @@ export default function HomeScreen({navigation}) {
                   top: -100,
                   width: '35%',
                   height: '30%',
-                  backgroundColor: '#bfbfff',
+                  backgroundColor: '#bfbfff66',
                   transform: [{translateY: Animated.multiply(nScroll, 0.8)}],
                   borderBottomRightRadius: 40
                 }}
@@ -184,7 +217,7 @@ export default function HomeScreen({navigation}) {
                   top: 100,
                   width: '40%',
                   height: '40%',
-                  backgroundColor: '#bfd5ff',
+                  backgroundColor: '#bfd5ff66',
                   transform: [{translateY: Animated.multiply(nScroll, 0.7)}],
                   borderTopLeftRadius: 35,
                   borderBottomLeftRadius: 35
@@ -198,7 +231,7 @@ export default function HomeScreen({navigation}) {
                   top: 450,
                   width: '70%',
                   height: '25%',
-                  backgroundColor: '#e0bfff',
+                  backgroundColor: '#e0bfff66',
                   transform: [{translateY: Animated.multiply(nScroll, 0.65)}]
                 }}
               />
@@ -215,8 +248,14 @@ export default function HomeScreen({navigation}) {
                     }}
                     showsHorizontalScrollIndicator={false}
                     overflow="visible"
-                    data={FAKEBUDGETDETAILSDATA}
-                    renderItem={({item, index}) => <BudgetItemWidget index={index} {...item}/> }
+                    data={expenseOutlaysArr}
+                    renderItem={({item, index}) => (
+                      <BudgetItemWidget 
+                        index={index} 
+                        {...item} 
+                        totalAmount={groupedTransactions[item.id]?.reduce((acc, t) => acc + t.amount, 0)?? 0}
+                      /> 
+                    )}
                   />
                 </Box>
               </Box>

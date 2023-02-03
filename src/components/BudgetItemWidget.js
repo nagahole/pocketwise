@@ -1,8 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import Slider from "@react-native-community/slider";
+import { darken, transparentize } from "color2k";
 import { Box, Circle, HStack, Text, VStack } from "native-base";
+import { useContext } from "react";
 import { Dimensions } from "react-native";
+import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import { DataContext } from "../stacks/MainAppStack";
 
-export default function BudgetItemWidget({label, budgetPerMonth, iconName, index}) {
+export default function BudgetItemWidget({id, outlay, totalAmount, index}) {
+
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+
+  const category = DEFAULT_CATEGORIES[id]?? userGeneratedCategories[id];
+
   return (
     <Box
       bg="white"
@@ -19,7 +29,7 @@ export default function BudgetItemWidget({label, budgetPerMonth, iconName, index
     >
       <Box
         height="42%"
-        bg="#C6E6FF"
+        bg={transparentize(category.color, 0.7)}
         borderTopRadius="30"
         p="4"
         px="5"
@@ -27,21 +37,34 @@ export default function BudgetItemWidget({label, budgetPerMonth, iconName, index
         <HStack justifyContent="space-between">
           <HStack>
             <Circle bg="white" w="12" h="12">
-              <FontAwesomeIcon icon={iconName} color="#2A9CF1" size={24}/>
+              <FontAwesomeIcon icon={category.icon} color={category.color} size={24}/>
             </Circle>
             <VStack pl="3" justifyContent="center">
-              <Text fontWeight="600">{label}</Text>
-              <Text color="#309DDE" fontWeight="600">${budgetPerMonth} per month</Text>
+              <Text fontWeight="600">{category.name.capitalize()}</Text>
+              <Text color={darken(category.color, 0.15)} fontWeight="600">${outlay} per month</Text>
             </VStack>
           </HStack>
           <Box>
-            <FontAwesomeIcon icon="fa-solid fa-ellipsis" color="#309DDE" size={20}/>
+            <FontAwesomeIcon icon="fa-solid fa-ellipsis" color={category.color} size={20}/>
           </Box>
         </HStack>
       </Box>
       <Box
         height="58%"
-      ></Box>
+        px="3.5"
+        py="7"
+      >
+        <Box w="100%" h="1.5" bg={transparentize(category.color, 0.85)} rounded={100} overflow="hidden">
+          <Box w={`${totalAmount / outlay * 100}%`} h="100%" bg={category.color} rounded={100}/>
+        </Box>
+        <Text textAlign="center" fontSize="14" mt="5">
+          Spent 
+            <Text fontWeight="600" color={category.color}> ${totalAmount.toFixed(2)} </Text> 
+          from 
+            <Text fontWeight="600" color={darken(category.color, 0.15)}> ${outlay.toFixed(2)} </Text> 
+          this month
+        </Text>
+      </Box>
     </Box>
   )
 }

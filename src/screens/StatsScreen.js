@@ -4,7 +4,7 @@ import { useContext, useEffect } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";import { VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ExpenseCategoryListItem from "../components/ExpenseCategoryListItem";
-import { ThisMonthsTransactionsContext } from "../stacks/MainAppStack";
+import { RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
 
 const FAKEDATA = [
   {
@@ -36,10 +36,12 @@ const FAKEDATA = [
 export default function StatsScreen({navigation}) {
   const insets = useSafeAreaInsets();
 
-  const thisMonthsTransactions = useContext(ThisMonthsTransactionsContext);
+  const recentTransactions = useContext(RecentTransactionsContext);
+
+  const thisMonthsTransactions = recentTransactions.filter(x => x.date > startOfTheMonth.getTime());
 
   //Map to avoid mutating original array
-  groupedTransactions = thisMonthsTransactions.map(x => x).reduce((acc, t) => {
+  const groupedTransactions = thisMonthsTransactions.map(x => x).filter(x => x.type === "expenses").reduce((acc, t) => {
     (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
 
     return acc;
@@ -68,7 +70,7 @@ export default function StatsScreen({navigation}) {
     }
   });
 
-  console.log(arr)
+  console.log(arr.length);
 
   return (
     <Box
@@ -83,9 +85,9 @@ export default function StatsScreen({navigation}) {
         data={arr}
         renderItem={({item}) => <ExpenseCategoryListItem {...item}/>}
         contentContainerStyle={{
-          padding: 12
+          padding: 15
         }}
-        keyExtractor={item => item.label}
+        keyExtractor={item => item.categoryID}
         ListHeaderComponent={(
           <Box py="3">
             <HStack justifyContent="space-between" alignItems="center" px="3">

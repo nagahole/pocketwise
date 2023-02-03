@@ -1,8 +1,17 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AspectRatio, Box, Center, HStack, Text, VStack } from "native-base";
-import { Dimensions } from "react-native";
+import chroma from "chroma-js";
+import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import { lighten, transparentize } from "color2k";
+import { useContext } from "react";
+import { CategoriesContext } from "../stacks/MainAppStack";
 
-export default function TransactionItem({ title, category, transaction }) {
+export default function TransactionItem({ reference, categoryID, amount, type, iconSize=22 }) {
+
+  const userGeneratedCategories = useContext(CategoriesContext);
+
+  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories.find(x => x.id === categoryID);
+
   return (
     <Box
       bg="white"
@@ -19,21 +28,39 @@ export default function TransactionItem({ title, category, transaction }) {
     >
       <HStack space={3.5}>
         <AspectRatio ratio={1} h="100%">
-          <Center bg="#DBEBFE" rounded={10}>
-            <FontAwesomeIcon color="#179AF8" icon="fa-solid fa-dollar-sign" size={22}/>
+          <Center bg={transparentize(category.color, 0.85)} rounded={10}>
+            <FontAwesomeIcon color={category.color} icon={category.icon} size={iconSize}/>
           </Center>
         </AspectRatio>
         <VStack flex={3} justifyContent="space-between" py="1" mt="-0.5">
-          <Text fontWeight="600" fontSize="16">{title}</Text>
-          <Text fontWeight="500" fontSize="12">{category}</Text>
+          <Text fontWeight="600" fontSize="16">{reference}</Text>
+          <Text fontWeight="500" fontSize="12">{category.name.capitalize()}</Text>
         </VStack>
         <Box justifyContent="center">
           <Text 
-            color={transaction < 0? "#E44749" : transaction > 0? "#85C462" : "#BAB9BC"}
+            color={
+              amount === 0
+              ? "#bab9bc" 
+              : type === "expenses"
+              ? "#e44749"
+              : type === "incomes"
+              ? "#85c462"
+              : "black"
+            }
             textAlign="right"
             fontWeight="bold"
             mr="1.5"
-          >{transaction < 0? `-$${(-transaction).toFixed(2)}` : `$${transaction.toFixed(2)}`}</Text>
+          >
+            {
+              amount == 0
+              ? amount.toFixed(2)
+              : type === "expenses"
+              ? `-$${amount.toFixed(2)}`
+              : type === "incomes"
+              ? `+$${amount.toFixed(2)}`
+              : `$${amount.toFixed(2)}`
+            }
+          </Text>
         </Box>
       </HStack>
     </Box>

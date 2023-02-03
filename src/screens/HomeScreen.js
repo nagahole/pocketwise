@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AspectRatio, Box, Button, Circle, FlatList, HStack, ScrollView, Text, VStack } from 'native-base'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BudgetItemWidget from '../components/BudgetItemWidget';
@@ -7,8 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { faker } from '@faker-js/faker';
 import TransactionItem from '../components/TransactionItem';
-import { Animated, Dimensions } from 'react-native';
+import { Alert, Animated, Dimensions } from 'react-native';
+import { ThisMonthsTransactionsContext, transactionsRef } from '../stacks/MainAppStack';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 
+//#region fake data
 export const FAKEBUDGETDETAILSDATA = [
   {
     label: faker.commerce.department(),
@@ -52,38 +57,20 @@ export const FAKEBUDGETDETAILSDATA = [
   },
 ]
 
-export const FAKERECENTTRANSACTIONSDATA = [
-  {
-    title: faker.commerce.product(),
-    category: faker.commerce.department(),
-    transaction: parseFloat(faker.finance.amount(-20,0, 0))
-  },
-  {
-    title: faker.commerce.product(),
-    category: faker.commerce.department(),
-    transaction: parseFloat(faker.finance.amount(-20,0, 0))
-  },
-  {
-    title: faker.commerce.product(),
-    category: faker.commerce.department(),
-    transaction: parseFloat(faker.finance.amount(-20,0, 0))
-  },
-  {
-    title: faker.commerce.product(),
-    category: faker.commerce.department(),
-    transaction: parseFloat(faker.finance.amount(-20,0, 0))
-  }
-]
+//#endregion
 
-const options = [
-  { label: "Expense", value: "expense" },
-  { label: "Income", value: "income" }
-];
+const RECENT_TRANSACTIONS_TO_SHOW = 5;
 
 export default function HomeScreen({navigation}) {
   const insets = useSafeAreaInsets();
 
   const nScroll = new Animated.Value(0);
+
+  const thisMonthsTransactions = useContext(ThisMonthsTransactionsContext);
+
+  const query = transactionsRef.orderBy("date", "desc").limit(RECENT_TRANSACTIONS_TO_SHOW);
+
+  const [recentTransactions] = useCollectionData(query, {idField: "id"});
 
   return (
     <Box 
@@ -153,7 +140,9 @@ export default function HomeScreen({navigation}) {
       {/* This box is the bottom half of the screen */}
       <Box flex={1.5}>
         <Animated.FlatList
-          data={FAKERECENTTRANSACTIONSDATA}
+          data={recentTransactions?? thisMonthsTransactions?.slice(0, Math.min(thisMonthsTransactions.length, RECENT_TRANSACTIONS_TO_SHOW))}
+          renderItem={({item}) => <TransactionItem {...item} />}
+          keyExtractor={item => item.id}
           onScroll={Animated.event([{
             nativeEvent: {
               contentOffset: {
@@ -162,7 +151,6 @@ export default function HomeScreen({navigation}) {
             }
           }], {useNativeDriver: true})}
           scrollEventThrottle={5}
-          keyExtractor={item => item.transaction}
           contentContainerStyle={{
             paddingHorizontal: 30
           }}
@@ -217,29 +205,6 @@ export default function HomeScreen({navigation}) {
 
               { /* Decorative Parallax Objects */}
               </Box>
-              <Box justifyContent="center" alignItems="center" pt="5" mt="2">
-                <SwitchSelector
-                  options={options}
-                  initial={0}
-                  onPress={value => console.log(`Call onPress with value: ${value}`)}
-                  buttonColor="white"
-                  backgroundColor="#F2F1F8"
-                  selectedColor="#6C4AFA"
-                  hasPadding
-                  valuePadding={5}
-                  borderColor="#F2F1F8"
-                  textColor="#242D4C"
-                  height={55}
-                  fontSize={16}
-                  textStyle={{
-                    fontWeight: '500'
-                  }}
-                  selectedTextStyle={{
-                    fontWeight: '500'
-                  }}
-                />
-              </Box>
-
               <Box mt="2">
                 <Text fontSize={24} mt="4" mb="5" fontWeight="500">Budget details</Text>
                 <Box>
@@ -266,7 +231,6 @@ export default function HomeScreen({navigation}) {
               </HStack>
             </>
           )}
-          renderItem={({item}) => <TransactionItem {...item} />}
         />
           
       </Box>

@@ -1,7 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { transparentize } from "color2k";
 import { Box, Center, HStack, Text, VStack } from "native-base";
+import { TouchableOpacity } from "react-native";
 
-export default function IconGrid({icons, itemsPerRow = 4, size = 60, iconSize = 20}) {
+export default function IconGrid({
+  icons, itemsPerRow = 4, size = 60, iconSize = 20, color, selectedIcon, setSelectedIcon
+}) {
 
   const rows = [];
 
@@ -21,12 +25,20 @@ export default function IconGrid({icons, itemsPerRow = 4, size = 60, iconSize = 
           <HStack justifyContent="space-between" key={i}>
             {
               row.map((icon, j) => (
-                <Center key={j} bg={icon == null? "transparent" : "#EFEDEF"} rounded={size * 0.3} style={{
-                  height: size,
-                  width: size
-                }}>
-                  { icon && <FontAwesomeIcon icon={icon} color="#ABA9AB" size={iconSize}/> }
-                </Center>
+                <TouchableOpacity onPress={() => setSelectedIcon(icon)}>
+                  <Center 
+                    key={j} 
+                    bg={icon == null? "transparent" : transparentize(color, 0.85)} 
+                    rounded={size * 0.3} 
+                    borderWidth={selectedIcon === icon? 2 : 0}
+                    style={{
+                      height: size,
+                      width: size
+                    }}
+                  >
+                    { icon && <FontAwesomeIcon icon={icon} size={iconSize} color={color}/> }
+                  </Center>
+                </TouchableOpacity>
               ))
             }
           </HStack>

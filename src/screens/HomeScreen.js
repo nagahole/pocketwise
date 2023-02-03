@@ -105,6 +105,10 @@ export default function HomeScreen({navigation}) {
     )
   });
 
+  function handleSeeAllButton() {
+    navigation.navigate("All Transactions");
+  }
+
   return (
     <Box 
       w="100%"
@@ -261,7 +265,7 @@ export default function HomeScreen({navigation}) {
               </Box>
               <HStack alignItems="center" justifyContent="space-between" mt="3" mb="2.5">
                 <Text fontSize={21} fontWeight="500">Recent transactions</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleSeeAllButton}>
                   <HStack alignItems="center" mt="1">
                     <Text fontSize={14}>See all</Text>
                     <FontAwesomeIcon icon="fa-solid fa-chevron-right" size={14}/>

@@ -1,1 +1,2 @@
 export const RECENT_TRANSACTIONS_TO_SHOW = 5;
+export const ITEMS_LOADED_AT_A_TIME = 10;

@@ -9,6 +9,7 @@ import { useCollection, useCollectionData } from 'react-firebase-hooks/firestore
 import { db } from "../firebase";
 import { createContext } from "react";
 import { RECENT_TRANSACTIONS_TO_SHOW } from "../data/Constants";
+import AllTransactionsScreen from "../screens/AllTransactionsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,8 +26,8 @@ export default function MainAppStack() {
     .doc(auth().currentUser.uid)
     .collection('transactions');
 
-  const transactionsQuery = transactionsRef.where("date", ">=", startOfTheMonth.getTime()).orderBy('date', 'desc');
-  const [transactions] = useCollectionData(transactionsQuery, {idField: 'id'});
+  const transactionsThisMonthQuery = transactionsRef.where("date", ">=", startOfTheMonth.getTime()).orderBy('date', 'desc');
+  const [transactionsThisMonth] = useCollectionData(transactionsThisMonthQuery, {idField: 'id'});
 
   const transactionsBeforeStartOfTheMonthQuery = 
     transactionsRef
@@ -41,20 +42,21 @@ export default function MainAppStack() {
   const [dataCollection] = useCollection(dataQuery, {idField: 'id'});
 
 
-  if (transactions == undefined 
+  if (transactionsThisMonth == undefined 
     || transactionsBeforeStartOfTheMonth == undefined 
     || dataCollection == undefined)
     return null;
 
   return (
     <DataContext.Provider value={dataCollection}>
-    <RecentTransactionsContext.Provider value={transactions}>
+    <RecentTransactionsContext.Provider value={transactionsThisMonth.concat(transactionsBeforeStartOfTheMonth)}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Main Tab" component={MainAppTabScreen}/> 
         <Stack.Screen name="Add Transaction" component={AddTransactionScreen}/>
         <Stack.Screen name="Add Budget" component={AddBudgetScreen}/> 
         <Stack.Screen name="Create Category" component={CreateCategoryScreen}/>
         <Stack.Screen name="Detailed Analytics" component={DetailedAnalyticsScreen}/> 
+        <Stack.Screen name="All Transactions" component={AllTransactionsScreen}/>
       </Stack.Navigator>
     </RecentTransactionsContext.Provider>
     </DataContext.Provider>

@@ -227,7 +227,7 @@ export default function AddTransactionScreen({navigation}) {
         <Box>
           <VStack space={3}>
             <Text fontWeight="600" fontSize={28}>Add transaction</Text>
-            <SwitchSelector
+            {/* <SwitchSelector
               options={SWITCH_OPTIONS}
               initial={0}
               onPress={value => setType(value)}
@@ -246,7 +246,7 @@ export default function AddTransactionScreen({navigation}) {
               selectedTextStyle={{
                 fontWeight: '500'
               }}
-            />
+            /> */}
             <Input
               placeholder="Reference"
               value={reference}
@@ -328,7 +328,7 @@ export default function AddTransactionScreen({navigation}) {
                   {...item} 
                   onPress={item.onPress?? (() => setCategoryID(item.value))} 
                   iconSize={20} 
-                  marginBottom={18}
+                  marginBottom={15}
                   selected={categoryID === item.value}
                   color={item.addNew? "" : item.color}
                 />

@@ -44,9 +44,9 @@ export default function BudgetItemWidget({id, outlay, totalAmount, index}) {
               <Text color={darken(category.color, 0.15)} fontWeight="600">${outlay} per month</Text>
             </VStack>
           </HStack>
-          <Box>
+          {/* <Box>
             <FontAwesomeIcon icon="fa-solid fa-ellipsis" color={category.color} size={20}/>
-          </Box>
+          </Box> */}
         </HStack>
       </Box>
       <Box

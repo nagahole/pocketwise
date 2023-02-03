@@ -42,7 +42,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
               <Select.Item label="By months" value="months"/>
             </Select>
             <Box mt="4">
-              <SwitchSelector
+              {/* <SwitchSelector
                 options={SWITCH_OPTIONS}
                 initial={0}
                 onPress={value => console.log(`Call onPress with value: ${value}`)}
@@ -61,7 +61,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                 selectedTextStyle={{
                   fontWeight: '500'
                 }}
-              />
+              /> */}
             </Box>
             <Box mt="4" rounded={20} borderWidth={1.5} borderColor="#EFEDEF" p="3">
               <Box h="64">

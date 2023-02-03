@@ -1,9 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AspectRatio, Box, Button, Center, FlatList, HStack, Select, Text, VStack } from "native-base";
+import { useContext, useEffect } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";import { VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ExpenseCategoryListItem from "../components/ExpenseCategoryListItem";
-
+import { ThisMonthsTransactionsContext } from "../stacks/MainAppStack";
 
 const FAKEDATA = [
   {
@@ -35,6 +36,40 @@ const FAKEDATA = [
 export default function StatsScreen({navigation}) {
   const insets = useSafeAreaInsets();
 
+  const thisMonthsTransactions = useContext(ThisMonthsTransactionsContext);
+
+  //Map to avoid mutating original array
+  groupedTransactions = thisMonthsTransactions.map(x => x).reduce((acc, t) => {
+    (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
+
+    return acc;
+  }, {});
+
+  let arr = Object.values(groupedTransactions).sort((a, b) => {
+    //Sum of a's transactions > sum of b's transactions
+    return -a.reduce((acc, t) => acc + t.amount, 0) + b.reduce((acc, t) => acc + t.amount, 0);
+  });
+
+  let categoryAmounts = {};
+
+  let totalAmount = arr.reduce((acc, categoryGroup) => {
+    let categoryAmount = categoryGroup.reduce((acc, t) => acc + t.amount, 0);
+    categoryAmounts[categoryGroup[0].categoryID] = categoryAmount;
+    return acc + categoryAmount
+  }, 0);
+
+  //Right now is an array of array of transactions
+  arr = arr.map(categoryGroup => {
+    return {
+      categoryID: categoryGroup[0].categoryID,
+      amount: categoryAmounts[categoryGroup[0].categoryID],
+      numberOfTransactions: categoryGroup.length,
+      percentageOfTotal: categoryAmounts[categoryGroup[0].categoryID] / totalAmount * 100
+    }
+  });
+
+  console.log(arr)
+
   return (
     <Box
       w="100%"
@@ -45,11 +80,12 @@ export default function StatsScreen({navigation}) {
       }}
     >
       <FlatList
-        data={FAKEDATA}
+        data={arr}
         renderItem={({item}) => <ExpenseCategoryListItem {...item}/>}
         contentContainerStyle={{
           padding: 12
         }}
+        keyExtractor={item => item.label}
         ListHeaderComponent={(
           <Box py="3">
             <HStack justifyContent="space-between" alignItems="center" px="3">

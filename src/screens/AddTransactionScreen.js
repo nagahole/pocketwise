@@ -161,7 +161,7 @@ export default function AddTransactionScreen({navigation}) {
           date === "today"
           ? Date.now()
           : date === "yesterday"
-          ? Date.now() - 60 * 60 * 24
+          ? Date.now() - 60 * 60 * 24 * 1000
           : new Date(date).getTime()
       })
       .then(docRef => {
@@ -179,7 +179,10 @@ export default function AddTransactionScreen({navigation}) {
           })
           .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message))
       })
-      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+      .catch(error => {
+        setButtonEnabled(true);
+        Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
+      });
   }
 
   function showDatePicker() {

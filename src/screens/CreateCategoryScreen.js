@@ -93,7 +93,7 @@ export default function CreateCategoryScreen({navigation}) {
     >
       <Box flex={1}>
         <Box>
-          <BackButton navigation={navigation}/>
+          <BackButton/>
           <Text fontWeight="600" fontSize={28} mb="3">Create category</Text>
           <SwitchSelector
             options={SWITCH_OPTIONS}

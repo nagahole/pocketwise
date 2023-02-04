@@ -5,25 +5,24 @@ import { Box, Circle, HStack, Text, VStack } from "native-base";
 import { useContext } from "react";
 import { Dimensions } from "react-native";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import useCategory from "../hooks/useCategory";
 import { DataContext } from "../stacks/MainAppStack";
 
-export default function BudgetItemWidget({id, outlay, totalAmount, index}) {
+export default function BudgetItemWidget({id, outlay, totalAmount, first, last}) {
 
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
-
-  const category = DEFAULT_CATEGORIES[id]?? userGeneratedCategories[id];
+  const category = useCategory(id);
 
   return (
     <Box
       bg="white"
       borderRadius="30"
-      ml={index === 0? "-1.5" : "2"}
-      mr="2"
+      ml={first? "-1.5" : "2"}
+      mr={last? "0" : "2"}
       style={{
         shadowRadius: 25,
         shadowOpacity: 0.05,
         shadowOffset: { width: -10, height: 10 },
-        width: Dimensions.get('window').width * 0.8,
+        width: Dimensions.get('window').width - 30 * 2 + 11,
         height: 200
       }}
     >

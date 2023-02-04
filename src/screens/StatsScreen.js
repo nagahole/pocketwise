@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AspectRatio, Box, Button, Center, FlatList, HStack, Select, Text, VStack } from "native-base";
 import { useContext, useEffect } from "react";
+import { LayoutAnimation } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";import { VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ExpenseCategoryListItem from "../components/ExpenseCategoryListItem";
@@ -41,27 +42,27 @@ export default function StatsScreen({navigation}) {
   const thisMonthsTransactions = recentTransactions.filter(x => x.date > startOfTheMonth.getTime());
 
   //Map to avoid mutating original array
-  const groupedTransactions = thisMonthsTransactions.map(x => x).filter(x => x.type === "expenses").reduce((acc, t) => {
+  const groupedExpenses = thisMonthsTransactions.map(x => x).filter(x => x.type === "expenses").reduce((acc, t) => {
     (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
 
     return acc;
   }, {});
 
-  let arr = Object.values(groupedTransactions).sort((a, b) => {
+  let expenseGroupsArr = Object.values(groupedExpenses).sort((a, b) => {
     //Sum of a's transactions > sum of b's transactions
     return -a.reduce((acc, t) => acc + t.amount, 0) + b.reduce((acc, t) => acc + t.amount, 0);
   });
 
   let categoryAmounts = {};
 
-  let totalAmount = arr.reduce((acc, categoryGroup) => {
+  let totalAmount = expenseGroupsArr.reduce((acc, categoryGroup) => {
     let categoryAmount = categoryGroup.reduce((acc, t) => acc + t.amount, 0);
     categoryAmounts[categoryGroup[0].categoryID] = categoryAmount;
     return acc + categoryAmount
   }, 0);
 
   //Right now is an array of array of transactions
-  arr = arr.map(categoryGroup => {
+  expenseGroupsArr = expenseGroupsArr.map(categoryGroup => {
     return {
       categoryID: categoryGroup[0].categoryID,
       amount: categoryAmounts[categoryGroup[0].categoryID],
@@ -69,8 +70,6 @@ export default function StatsScreen({navigation}) {
       percentageOfTotal: categoryAmounts[categoryGroup[0].categoryID] / totalAmount * 100
     }
   });
-
-  console.log(arr.length);
 
   return (
     <Box
@@ -82,7 +81,7 @@ export default function StatsScreen({navigation}) {
       }}
     >
       <FlatList
-        data={arr}
+        data={expenseGroupsArr}
         renderItem={({item}) => <ExpenseCategoryListItem {...item}/>}
         contentContainerStyle={{
           padding: 15
@@ -130,10 +129,10 @@ export default function StatsScreen({navigation}) {
                   offset={15}
                 >
                   <VictoryBar
-                    data={[{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 5}, { x:4, y:7}, {x:5, y:8}, {x:6, y:10}]}
+                    data={[{ x: 1, y: 1 }, { x: 2, y: 42 }, { x: 4, y: 5}, { x:4, y:6}, {x:2, y:1}, {x:6, y:50}]}
                   />
                   <VictoryBar
-                    data={[{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 5}, { x:4, y:7}, {x:5, y:8}, {x:6, y:10}]}
+                    data={[{ x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 5}, { x:5, y:7}, {x:5, y:4}, {x:6, y:1}]}
                   />
                 </VictoryGroup>
               </VictoryChart>

@@ -95,7 +95,7 @@ export default function AddBudgetScreen({navigation}) {
         selectCategory={setSelectedCategory}
       />
       <ScrollView px="4">
-        <BackButton navigation={navigation}/>
+        <BackButton/>
         <Text fontWeight="700" fontSize="30" mt="3">Add new budget</Text>
         <VStack mt="4" space={2.5}>
           <Box>

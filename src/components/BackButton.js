@@ -1,8 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { useNavigation } from '@react-navigation/native'
 import { AspectRatio, Box, Center } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
-export default function BackButton({navigation}) {
+export default function BackButton() {
+
+  const navigation = useNavigation();
+
   return (
     <Box 
       style={{

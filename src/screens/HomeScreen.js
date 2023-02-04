@@ -12,8 +12,10 @@ import { DataContext, RecentTransactionsContext, startOfTheMonth, transactionsRe
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { RECENT_TRANSACTIONS_TO_SHOW } from '../data/Constants';
+import { RECENT_TRANSACTIONS_TO_SHOW, SHOW_PARALLAX_OBJECTS } from '../data/Constants';
 import DEFAULT_CATEGORIES from '../data/DefaultCategories';
+import useCategory from '../hooks/useCategory';
+import { lighten } from 'color2k';
 
 //#region fake data
 export const FAKEBUDGETDETAILSDATA = [
@@ -74,11 +76,9 @@ export default function HomeScreen({navigation}) {
 
   let expenseOutlaysArr = [];
 
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
-
   for (let key in rawOutlaysObject) {
 
-    const category = DEFAULT_CATEGORIES[key]?? userGeneratedCategories[key];
+    const category = useCategory(key);
 
     if (category.type !== "expenses")
       continue;
@@ -145,30 +145,8 @@ export default function HomeScreen({navigation}) {
             <VStack w="100%" h="100%" px="8" style={{ paddingTop: 25 }}>
               <HStack space={2}>
                 <Text color="white" fontSize="40">$ {transactionsThisMonth.reduce((acc, t) => acc + t.amount, 0).toFixed(2)}</Text>
-                {/* <Box justifyContent="center">
-                  <Box bg="#6EB6FF" rounded={100} px="2.5">
-                    <Text color="white" fontWeight="600">+8%</Text>
-                  </Box>
-                </Box> */}
               </HStack>
               <Text color="white" fontSize="16" mt="1">Spent out of a ${Math.round(expenseOutlaysArr.reduce((acc, e) => acc + e.outlay, 0))} budget</Text>
-              {/* <Box flex={1} justifyContent="center" mb="1.5">
-                <Button
-                  bg="#FED9DA"
-                  _pressed={{
-                    backgroundColor: "#e0bfc0"
-                  }}
-                  rounded={100}
-                  w="50%"
-                  h="12"
-                  onPress={() => navigation.navigate("Budget")}
-                >
-                  <HStack alignItems="center" space={1.5}>
-                    <FontAwesomeIcon color="#853B8A" icon="fa-solid fa-pencil" style={{ marginTop: 1 }}/>
-                    <Text color="#853B8A" fontSize={16} fontWeight="600">Edit budget</Text>
-                  </HStack>
-                </Button>
-              </Box> */}
             </VStack>
           </Box>
         </Box>
@@ -203,44 +181,49 @@ export default function HomeScreen({navigation}) {
               >
 
               { /* Decorative Parallax Objects */}
-              <Animated.View
-                style={{
-                  position: 'absolute',
-                  top: -100,
-                  width: '35%',
-                  height: '30%',
-                  backgroundColor: '#bfbfff66',
-                  transform: [{translateY: Animated.multiply(nScroll, 0.8)}],
-                  borderBottomRightRadius: 40
-                }}
-              />
-              <Animated.View
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  top: 100,
-                  width: '40%',
-                  height: '40%',
-                  backgroundColor: '#bfd5ff66',
-                  transform: [{translateY: Animated.multiply(nScroll, 0.7)}],
-                  borderTopLeftRadius: 35,
-                  borderBottomLeftRadius: 35
-                }}
-              />
-              <Animated.View
-                style={{
-                  borderRadius: 70,
-                  position: 'absolute',
-                  left: -Dimensions.get('window').width * 0.15,
-                  top: 450,
-                  width: '70%',
-                  height: '25%',
-                  backgroundColor: '#e0bfff66',
-                  transform: [{translateY: Animated.multiply(nScroll, 0.65)}]
-                }}
-              />
+              {
+                SHOW_PARALLAX_OBJECTS && (
+                  <>
+                    <Animated.View
+                      style={{
+                        position: 'absolute',
+                        top: -100,
+                        width: '35%',
+                        height: '30%',
+                        backgroundColor: '#bfbfff66',
+                        transform: [{translateY: Animated.multiply(nScroll, 0.8)}],
+                        borderBottomRightRadius: 40
+                      }}
+                    />
+                    <Animated.View
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 100,
+                        width: '40%',
+                        height: '40%',
+                        backgroundColor: '#bfd5ff66',
+                        transform: [{translateY: Animated.multiply(nScroll, 0.7)}],
+                        borderTopLeftRadius: 35,
+                        borderBottomLeftRadius: 35
+                      }}
+                    />
+                    <Animated.View
+                      style={{
+                        borderRadius: 70,
+                        position: 'absolute',
+                        left: -Dimensions.get('window').width * 0.15,
+                        top: 450,
+                        width: '70%',
+                        height: '25%',
+                        backgroundColor: '#e0bfff66',
+                        transform: [{translateY: Animated.multiply(nScroll, 0.65)}]
+                      }}
+                    />
+                  </>
+                )
+              }
 
-              { /* Decorative Parallax Objects */}
               </Box>
               <Box mt="2">
                 <Text fontSize={24} mt="4" mb="5" fontWeight="500">Budget details</Text>
@@ -255,10 +238,48 @@ export default function HomeScreen({navigation}) {
                     data={expenseOutlaysArr}
                     renderItem={({item, index}) => (
                       <BudgetItemWidget 
-                        index={index} 
+                        first={index === 0}
+                        last={index === expenseOutlaysArr.length - 1}
                         {...item} 
                         totalAmount={groupedTransactions[item.id]?.reduce((acc, t) => acc + t.amount, 0)?? 0}
                       /> 
+                    )}
+                    ListEmptyComponent={(
+                      <Box 
+                        style={{
+                          marginHorizontal: -30,
+                          width: Dimensions.get('window').width,
+                          height: 200,
+                          paddingHorizontal: 50
+                        }}
+                      >
+                        <Box flex="1" rounded={30} bg={lighten("#6a48fa", 0.05)} p="5" style={{
+                          shadowRadius: 25,
+                          shadowOpacity: 0.1,
+                          shadowOffset: { width: -5, height: 5 },
+                        }}>
+                          <Text textAlign="center" fontWeight="600" fontSize="24" color="white">New here?</Text>
+                          <Text textAlign="center" fontWeight="400" fontSize="16" color="white" mt="2">Start laying out your budget now!</Text>
+
+                          <Box flex={1} justifyContent="center" alignItems="center" mt="9" px="10">
+                            <Button
+                              bg="#FED9DA"
+                              _pressed={{
+                                backgroundColor: "#e0bfc0"
+                              }}
+                              rounded={100}
+                              w="100%"
+                              h="12"
+                              onPress={() => navigation.navigate("Budget")}
+                            >
+                              <HStack alignItems="center" space={1.5}>
+                                <FontAwesomeIcon color="#853B8A" icon="fa-solid fa-pencil" style={{ marginTop: 1 }}/>
+                                <Text color="#853B8A" fontSize={16} fontWeight="600">Create budget</Text>
+                              </HStack>
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Box>
                     )}
                   />
                 </Box>

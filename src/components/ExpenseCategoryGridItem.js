@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { lighten, transparentize } from "color2k";
+import { darken, lighten, transparentize } from "color2k";
 import { AspectRatio, Box, Center, Text, VStack } from "native-base";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -17,6 +17,7 @@ export default function ExpenseCategoryGridItem({
             ? 2
             : 0
           }
+          borderColor={addNew? "black" : darken(color, 0.1)}
           bg={addNew? "white" : transparentize(color, 0.85)}
           rounded={size * 0.3}
           style={{

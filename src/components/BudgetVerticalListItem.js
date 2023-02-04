@@ -1,18 +1,28 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { useNavigation } from "@react-navigation/native";
 import { transparentize } from "color2k";
 import { Box, Text, AspectRatio, Center, HStack, VStack } from "native-base";
 import { useContext } from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import useCategory from "../hooks/useCategory";
 import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
 
 export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAmount}) {
 
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+  const category = useCategory(id);
 
-  const category = DEFAULT_CATEGORIES[id]?? userGeneratedCategories[id];
+  const navigation = useNavigation();
+
+  function handleEditBudget() {
+    navigation.navigate("Edit Budget", { id, outlay });
+  }
 
   return (
-    <Box w="100%" borderColor="#EFEDEF" borderWidth={1.5} mb="4" rounded={24} style={{
+    <Box w="100%" bg="white" mb="4" rounded={24} style={{
+      shadowRadius: 25,
+      shadowOpacity: 0.05,
+      shadowOffset: { width: -10, height: 10 },
       height: 75
     }}>
       <HStack w="100%" space={3} alignItems="center" p="2.5">
@@ -27,7 +37,9 @@ export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAm
         <VStack flex={2} justifyContent="space-between" pr="1">
           <HStack justifyContent="space-between">
             <Text fontWeight="bold" fontSize={16}>{category.name.capitalize()}</Text>
-            <FontAwesomeIcon icon="fa-solid fa-pencil"/>
+            <TouchableOpacity onPress={handleEditBudget}>
+              <FontAwesomeIcon icon="fa-solid fa-pencil" color="gray"/>
+            </TouchableOpacity>
           </HStack>
           <HStack justifyContent="space-between" alignItems="flex-end">
             <Text color="black" fontWeight="600">${totalAmount.toFixed(2)}</Text>

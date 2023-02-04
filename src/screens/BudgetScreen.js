@@ -4,7 +4,9 @@ import { TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BudgetVerticalListItem from "../components/BudgetVerticalListItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import useCategory from "../hooks/useCategory";
 import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
+import { FlashList } from "@shopify/flash-list";
 
 export default function BudgetScreen({navigation}) {
   const insets = useSafeAreaInsets();
@@ -15,11 +17,9 @@ export default function BudgetScreen({navigation}) {
 
   let expenseOutlaysArr = [];
 
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
-
   for (let key in rawOutlaysObject) {
 
-    const category = DEFAULT_CATEGORIES[key]?? userGeneratedCategories[key];
+    const category = useCategory(key);
 
     if (category.type !== "expenses")
       continue;
@@ -66,9 +66,13 @@ export default function BudgetScreen({navigation}) {
           data={expenseOutlaysArr}
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.id}
+          style={{
+            marginHorizontal: -20
+          }}
           contentContainerStyle={{
             paddingTop: 20,
-            paddingBottom: 34
+            paddingBottom: 34,
+            paddingHorizontal: 20
           }}
           renderItem={({item}) => (
             <BudgetVerticalListItem 

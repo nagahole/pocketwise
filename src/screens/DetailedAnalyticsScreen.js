@@ -27,7 +27,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
         }}
         ListHeaderComponent={() => (
           <Box>
-            <BackButton navigation={navigation}/>
+            <BackButton/>
             <Text fontWeight="600" fontSize={32}>Detailed analytics</Text>
             <Select 
               mt="3"

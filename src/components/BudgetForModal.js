@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import DEFAULT_CATEGORIES from '../data/DefaultCategories';
 import { transparentize } from 'color2k';
 import { DataContext } from '../stacks/MainAppStack';
+import { FlashList } from "@shopify/flash-list";
 
 export default function BudgetForModal({visible, closeModal, modalHeight = 400, selectCategory}) {
 
@@ -87,9 +88,10 @@ export default function BudgetForModal({visible, closeModal, modalHeight = 400, 
           height: modalHeight
         }, modalStyle]}
       >
-        <FlatList
+        <FlashList
           showsVerticalScrollIndicator={false}
           data={allUnaddedExpenseCategories}
+          estimatedItemSize={50}
           contentContainerStyle={{
             paddingHorizontal: 12,
             paddingTop: 30,

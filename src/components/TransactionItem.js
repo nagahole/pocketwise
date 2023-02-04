@@ -1,19 +1,28 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AspectRatio, Box, Center, HStack, Text, VStack } from "native-base";
-import chroma from "chroma-js";
-import DEFAULT_CATEGORIES from "../data/DefaultCategories";
-import { lighten, transparentize } from "color2k";
-import { useContext } from "react";
-import { DataContext } from "../stacks/MainAppStack";
+import { transparentize } from "color2k";
+import { useRef } from "react";
+import useCategory from "../hooks/useCategory";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
+import { Alert, Animated, StyleSheet } from "react-native";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+import { useNavigation } from "@react-navigation/native";
 
-export default function TransactionItem({ reference, categoryID, amount, type, iconSize=22 }) {
+export default function TransactionItem({ 
+  id, reference, categoryID, amount, type, iconSize=22, swipeable = true, date,
+  onItemDelete = () => {}, onItemEdit = () => {}
+}) {
 
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+  const category = useCategory(categoryID);
 
-  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories[categoryID];
+  const swipeableRow = useRef(null);
 
-  return (
+  const navigation = useNavigation();
+
+  const component = (
     <Box
+      key={id}
       bg="white"
       borderRadius="20"
       p="2.5"
@@ -65,4 +74,127 @@ export default function TransactionItem({ reference, categoryID, amount, type, i
       </HStack>
     </Box>
   )
+
+  function renderRightAction(icon, color, x, progress, onPress = () => {})  {
+
+    const trans = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [x, 0],
+      extrapolate: "clamp"
+    });
+
+    const pressHandler = () => {
+      onPress()
+      close();
+    };
+
+    return (
+      <Animated.View 
+        style={{ flex: 1, transform: [{ translateX: trans }] }}>
+        <RectButton
+          style={[styles.rightAction]}
+          onPress={pressHandler}
+        >
+          <FontAwesomeIcon icon={icon} color={color} size={20}/>
+        </RectButton>
+      </Animated.View>
+    );
+  };
+
+  function renderRightActions(progress) {
+    return (
+      <Box style={{ width: 192, paddingBottom: 12, paddingLeft: 8 }}>
+        <Box 
+          flexDir="row" 
+          flex={1}
+          overflow="hidden"
+          rounded={20}
+        >
+          {renderRightAction('fa-solid fa-pencil', 'black', 192, progress, () => {
+            navigation.navigate(
+              "Edit Transaction", 
+              {
+                transactionInfo: {
+                  reference,
+                  id,
+                  categoryID,
+                  amount,
+                  type,
+                  date
+                  //etc add more as transactions get more complicated
+                },
+                onFinishEditing(transactionObj) {
+                  onItemEdit(transactionObj);
+                }
+              }
+            );
+          })}
+          {renderRightAction('fa-solid fa-trash', 'black', 96, progress, () => {
+            Alert.alert(
+              "Delete this transaction?",
+              "This cannot be undone. Continue?",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel"
+                },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress() {
+                    firestore()
+                      .collection("users")
+                      .doc(auth().currentUser.uid)
+                      .collection("transactions")
+                      .doc(id)
+                      .delete()
+                      .then(() => onItemDelete())
+                      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+                  }
+                }
+              ]
+            )
+          })}
+        </Box>
+      </Box>
+    ) 
+  }
+
+  function updateRef(ref) {
+    swipeableRow.current = ref;
+  };
+
+  function close() {
+    swipeableRow.current.close();
+  };
+
+  if (swipeable) {
+    return (
+      <Swipeable 
+        ref={updateRef}
+        friction={2}
+        leftThreshold={30}
+        renderRightActions={renderRightActions}
+        containerStyle={{ overflow: "visible" }}
+      >
+        {component}
+      </Swipeable>
+    )
+  }
+
+  return component;
 }
+
+const styles = StyleSheet.create({
+  actionText: {
+    color: 'white',
+    fontSize: 16,
+    backgroundColor: 'transparent',
+    padding: 10,
+  },
+  rightAction: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+});

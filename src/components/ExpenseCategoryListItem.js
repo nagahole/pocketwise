@@ -4,18 +4,17 @@ import { AspectRatio, Box, Center, HStack, Text, VStack } from "native-base";
 import { useContext } from "react";
 import { TouchableOpacity } from "react-native";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import useCategory from "../hooks/useCategory";
 import { DataContext } from "../stacks/MainAppStack";
 
 export default function ExpenseCategoryListItem({
-  categoryID, amount, iconSize=22, numberOfTransactions, percentageOfTotal
+  categoryID, amount, iconSize=22, numberOfTransactions, percentageOfTotal, onPress
 }) {
 
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data();
-
-  const category = DEFAULT_CATEGORIES[categoryID]?? userGeneratedCategories[categoryID];
+  const category = useCategory(categoryID);
 
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={onPress}>
       <Box w="100%" bg="white" mb="4" rounded={24} style={{
         shadowRadius: 20,
         shadowOpacity: 0.08,
@@ -33,13 +32,13 @@ export default function ExpenseCategoryListItem({
           </AspectRatio>
           <VStack flex={2}>
             <Text fontWeight="bold" fontSize={16}>{category.name.capitalize()}</Text>
-            <Text color="#CBCACB" fontWeight="600" fontSize={12}>{numberOfTransactions} transaction{numberOfTransactions === 1? "" : "s"}</Text>
+            <Text color="#999" fontWeight="600" fontSize={12}>{numberOfTransactions} transaction{numberOfTransactions === 1? "" : "s"}</Text>
           </VStack>
           <VStack flex={1} alignItems="flex-end">
             <Text fontWeight="bold" color={ amount === 0? "#bab9bc" : "#e44749"}>
               -${amount.toFixed(2)}
             </Text>
-            <Text color="#C5C3C7">{Math.round(percentageOfTotal)}%</Text>
+            <Text color="#999">{Math.round(percentageOfTotal)}%</Text>
           </VStack>
         </HStack>
       </Box>

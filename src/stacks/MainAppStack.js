@@ -4,12 +4,14 @@ import AddTransactionScreen from "../screens/AddTransactionScreen";
 import AddBudgetScreen from "../screens/AddBudgetScreen";
 import CreateCategoryScreen from "../screens/CreateCategoryScreen";
 import DetailedAnalyticsScreen from "../screens/DetailedAnalyticsScreen";
+import EditBudgetScreen from "../screens/EditBudgetScreen";
 import auth from '@react-native-firebase/auth';
 import { useCollection, useCollectionData } from 'react-firebase-hooks/firestore';
 import { db } from "../firebase";
 import { createContext } from "react";
 import { RECENT_TRANSACTIONS_TO_SHOW } from "../data/Constants";
 import AllTransactionsScreen from "../screens/AllTransactionsScreen";
+import EditTransactionScreen from "../screens/EditTransactionScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +21,7 @@ export const DataContext = createContext({});
 export const startOfTheMonth = new Date();
 startOfTheMonth.setDate(0);
 
+// Maybe use useCollection instead of useCollectionData so I can use startAt and startAfter?
 export default function MainAppStack() {
 
   transactionsRef = db
@@ -57,6 +60,8 @@ export default function MainAppStack() {
         <Stack.Screen name="Create Category" component={CreateCategoryScreen}/>
         <Stack.Screen name="Detailed Analytics" component={DetailedAnalyticsScreen}/> 
         <Stack.Screen name="All Transactions" component={AllTransactionsScreen}/>
+        <Stack.Screen name="Edit Budget" component={EditBudgetScreen}/>
+        <Stack.Screen name="Edit Transaction" component={EditTransactionScreen}/>
       </Stack.Navigator>
     </RecentTransactionsContext.Provider>
     </DataContext.Provider>

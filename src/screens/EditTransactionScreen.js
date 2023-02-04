@@ -6,7 +6,7 @@ import BackButton from "../components/BackButton";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { Alert, Dimensions } from "react-native";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SimpleGrid } from "react-native-super-grid";
 import ExpenseCategoryGridItem from "../components/ExpenseCategoryGridItem";
@@ -14,15 +14,11 @@ import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import { DataContext } from "../stacks/MainAppStack";
 import { transparentize } from "color2k";
 
-export const SWITCH_OPTIONS = [
-  { label: "Expenses", value: "expenses" },
-  { label: "Incomes", value: "incomes" },
-  { label: "Savings", value: "savings" }
-];
-
-export default function AddTransactionScreen({navigation}) {
+export default function EditTransactionScreen({navigation, route}) {
 
   const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+
+  const transactionInfo = route.params.transactionInfo;
 
   //#region setting up categories
   const EXPENSE_CATEGORIES = 
@@ -119,17 +115,43 @@ export default function AddTransactionScreen({navigation}) {
 
   const [type, setType] = useState("expenses");
 
-  const [reference, setReference] = useState("");
-  const [amount, setAmount] = useState("");
+  const [reference, setReference] = useState(transactionInfo.reference);
+  const [amount, setAmount] = useState(transactionInfo.amount.toString());
 
-  const [categoryID, setCategoryID] = useState();
+  const [categoryID, setCategoryID] = useState(transactionInfo.categoryID);
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
-  const [date, setDate] = useState("today");
+  const [date, setDate] = useState(
+    function() {
+      let transactionDate = new Date(transactionInfo.date);
+      transactionDate.setHours(0,0,0,0);
+
+      let curDate = new Date();
+      curDate.setHours(0,0,0,0);
+
+      if (transactionDate.getTime() === curDate.getTime()) {
+        return "today"
+      } else {
+        let yesterdaysDate = curDate;
+
+        // setDate will go to previous month when it becomes 0
+        yesterdaysDate.setDate(yesterdaysDate.getDate() - 1);
+
+        if (transactionDate.getTime() === yesterdaysDate.getTime()) {
+          return "yesterday";
+        }
+      }
+
+      return transactionDate.toString();
+
+    }()
+  );
+
+  const initialDate = useRef(date);
 
   const [buttonEnabled, setButtonEnabled] = useState(true);
 
-  function handleAddTransaction() {
+  function handleEditTransaction() {
 
     if (reference === "") {
       Alert.alert("Please enter a reference");
@@ -148,36 +170,37 @@ export default function AddTransactionScreen({navigation}) {
 
     setButtonEnabled(false);
 
+    console.log(`Date: ${date}, initialDate: ${initialDate.current}`);
+
+    let writeDate = 
+      date === initialDate.current
+      ? transactionInfo.date
+      : date === "today"
+      ? Date.now()
+      : date === "yesterday"
+      ? Date.now() - 60 * 60 * 24 * 1000
+      : new Date(date).getTime()
+
+    let transactionObj = {
+      type,
+      reference,
+      amount: parseFloat(amount),
+      categoryID,
+      date: writeDate
+    }
+
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
       .collection("transactions")
-      .add({
-        type,
-        reference,
-        amount: parseFloat(amount),
-        categoryID,
-        date:
-          date === "today"
-          ? Date.now()
-          : date === "yesterday"
-          ? Date.now() - 60 * 60 * 24 * 1000
-          : new Date(date).getTime()
-      })
-      .then(docRef => {
+      .doc(transactionInfo.id)
+      .update(transactionObj)
+      .then(() => {
 
         setButtonEnabled(true);
+        route.params.onFinishEditing(transactionObj);
         navigation.goBack();
-
-        firestore()
-          .collection('users')
-          .doc(auth().currentUser.uid)
-          .collection("transactions")
-          .doc(docRef.id)
-          .update({
-            id: docRef.id
-          })
-          .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message))
+        
       })
       .catch(error => {
         setButtonEnabled(true);
@@ -229,27 +252,7 @@ export default function AddTransactionScreen({navigation}) {
       <Box flex={1}>
         <Box>
           <VStack space={3}>
-            <Text fontWeight="600" fontSize={28}>Add transaction</Text>
-            {/* <SwitchSelector
-              options={SWITCH_OPTIONS}
-              initial={0}
-              onPress={value => setType(value)}
-              buttonColor="white"
-              backgroundColor="#F2F1F8"
-              selectedColor="#6C4AFA"
-              hasPadding
-              valuePadding={2}
-              borderColor="#F2F1F8"
-              textColor="#242D4C"
-              height={45}
-              fontSize={16}
-              textStyle={{
-                fontWeight: '500'
-              }}
-              selectedTextStyle={{
-                fontWeight: '500'
-              }}
-            /> */}
+            <Text fontWeight="600" fontSize={28}>Edit transaction</Text>
             <Input
               placeholder="Reference"
               value={reference}
@@ -385,8 +388,8 @@ export default function AddTransactionScreen({navigation}) {
           </HStack>
 
           <Box style={{ height: 55 }}>
-            <Button disabled={!buttonEnabled} w="100%" h="100%" rounded={100} bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} _pressed={{ backgroundColor: 'black' }} onPress={handleAddTransaction}>
-              <Text color="white" fontWeight="500" fontSize={16}>ADD TRANSACTION</Text>
+            <Button disabled={!buttonEnabled} w="100%" h="100%" rounded={100} bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} _pressed={{ backgroundColor: 'black' }} onPress={handleEditTransaction}>
+              <Text color="white" fontWeight="500" fontSize={16}>EDIT TRANSACTION</Text>
             </Button>
           </Box>
 

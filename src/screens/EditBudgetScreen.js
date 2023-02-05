@@ -1,5 +1,5 @@
 import { Box, Button, Center, Input, ScrollView, Text, VStack } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import BackButton from "../components/BackButton";
 import useCategory from "../hooks/useCategory";

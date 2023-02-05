@@ -8,14 +8,14 @@ import { transparentize } from "color2k";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
-const documentReference = 
-  firestore()
-    .collection("users")
-    .doc(auth().currentUser.uid)
-    .collection("data")
-    .doc("outlays");
-
 export default function AddBudgetScreen({navigation}) {
+
+  const documentReference = 
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("outlays");
 
   const [budgetModalVisible, setBudgetModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(-1);

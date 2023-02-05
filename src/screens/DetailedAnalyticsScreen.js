@@ -9,21 +9,64 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { FAKERECENTTRANSACTIONSDATA } from "./HomeScreen";
 import TransactionItem from "../components/TransactionItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
+import { useContext } from "react";
+import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
+import { getRandomNumber, interpolateColors } from "../../utils/ColorGenerator";
+import * as d3 from "d3";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RECENT_TRANSACTIONS_TO_SHOW } from "../data/Constants";
+import moment from "moment";
+import { groupTransactionsByCategory, getExpenseGroupsArr } from "../../utils/NagaUtils";
 
 export default function DetailedAnalyticsScreen({navigation}) {
   
+  const recentTransactions = useContext(RecentTransactionsContext);
+  const transactionsThisMonth = recentTransactions.filter(x => x.date > startOfTheMonth.getTime());
+
+  const groupedTransactions = groupTransactionsByCategory(transactionsThisMonth);
+
+  let [expenseGroupsArr, totalAmount] = getExpenseGroupsArr(groupedTransactions);
+
+  const arrayLength = expenseGroupsArr.length;
+  const colorScale = d3.interpolateWarm;
+  const colorRangeInfo = {
+    colorStart: 0,
+    colorEnd: 1,
+    useEndAsStart: false,
+  }; 
+
+  const colors = interpolateColors(arrayLength, colorScale, colorRangeInfo);
+
+  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+
+  let data = expenseGroupsArr.map(expGroup => {
+    let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
+
+    return {
+      x: category.name.capitalize(),
+      y: expGroup.amount
+    }
+  })
+
+  const insets = useSafeAreaInsets();
+
+  function handleSeeMore() {
+    navigation.navigate("See Transactions", { category: "all", dateRange: "all" })
+  }
+
   return (
     <Box
       w="100%"
       h="100%"
-      safeArea
+      safeAreaTop
       bg="white"
     >
       <FlatList
-        data={FAKERECENTTRANSACTIONSDATA}
+        data={recentTransactions.slice(0, Math.min(RECENT_TRANSACTIONS_TO_SHOW, recentTransactions.length))}
         renderItem={({item}) => <TransactionItem {...item}/>}
         contentContainerStyle={{
-          paddingHorizontal: 20
+          paddingHorizontal: 20,
+          paddingBottom: insets.bottom
         }}
         ListHeaderComponent={() => (
           <Box>
@@ -36,6 +79,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
               px="4"
               rounded="15"
               placeholder="Graph by..."
+              defaultValue="months"
             >
               <Select.Item label="By days" value="days"/>
               <Select.Item label="By weeks" value="weeks"/>
@@ -67,7 +111,8 @@ export default function DetailedAnalyticsScreen({navigation}) {
               <Box h="64">
                 <Svg viewBox={`0 0 ${Dimensions.get('window').width - 40} 400`}>
                   <VictoryPie 
-                    colorScale="qualitative"
+                    colorScale={colors}
+                    data={data}
                     labels={() => null}
                     padding={{
                       right: 40,
@@ -84,7 +129,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                   />
                   <VictoryLabel 
                     textAnchor="middle" 
-                    text="$1,250"
+                    text={`$${Math.round(totalAmount)}`}
                     x={(Dimensions.get('window').width - 40)* 0.49}
                     y={200}
                     style={{
@@ -103,7 +148,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                   />
                   <VictoryLabel 
                     textAnchor="middle" 
-                    text="August, 2022"
+                    text={moment().format("MMMM, YYYY")}
                     x={(Dimensions.get('window').width - 40) * 0.49}
                     y={250}
                     style={{
@@ -114,20 +159,23 @@ export default function DetailedAnalyticsScreen({navigation}) {
               </Box>
               <Box flexDir="row" flexWrap="wrap" mt="3">
                 {
-                  Object.values(DEFAULT_CATEGORIES).map(({label}) => (
-                    <Circle borderColor="#E4E3E3" borderWidth={1} py="0.5" px="2" mb="2" mr="2" key={label}>
-                      <HStack space={1} alignItems="center">
-                        <Circle w="3" h="3" bg="red.300"/>
-                        <Text>{label}</Text>
-                      </HStack>
-                    </Circle>
-                  ))
+                  expenseGroupsArr.map((expGroup, i) => {
+                    let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
+                    return (
+                      <Circle borderColor="#E4E3E3" borderWidth={1} py="0.5" px="2" mb="2" mr="2" key={category.id}>
+                        <HStack space={1} alignItems="center">
+                          <Circle w="3" h="3" bg={colors[i]}/>
+                          <Text>{category.name.capitalize()}</Text>
+                        </HStack>
+                      </Circle>
+                    )
+                  })
                 }
               </Box>
             </Box>
             <HStack alignItems="center" justifyContent="space-between" mt="7" mb="2.5">
               <Text fontSize={21} fontWeight="500">Recent transactions</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleSeeMore}>
                 <HStack alignItems="center" mt="1">
                   <Text fontSize={14}>See all</Text>
                   <FontAwesomeIcon icon="fa-solid fa-chevron-right" size={14}/>

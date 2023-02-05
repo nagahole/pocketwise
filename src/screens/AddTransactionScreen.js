@@ -13,6 +13,7 @@ import ExpenseCategoryGridItem from "../components/ExpenseCategoryGridItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import { DataContext } from "../stacks/MainAppStack";
 import { transparentize } from "color2k";
+import { faker } from '@faker-js/faker';
 
 export const SWITCH_OPTIONS = [
   { label: "Expenses", value: "expenses" },
@@ -183,6 +184,7 @@ export default function AddTransactionScreen({navigation}) {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
       });
+
   }
 
   function showDatePicker() {

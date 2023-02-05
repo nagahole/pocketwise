@@ -4,6 +4,7 @@ import auth from '@react-native-firebase/auth';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Alert } from "react-native";
 
 export default function SignupScreen({navigation}) {
 

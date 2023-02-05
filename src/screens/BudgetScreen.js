@@ -7,6 +7,7 @@ import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import useCategory from "../hooks/useCategory";
 import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
 import { FlashList } from "@shopify/flash-list";
+import { groupTransactionsByCategory } from "../../utils/NagaUtils";
 
 export default function BudgetScreen({navigation}) {
   const insets = useSafeAreaInsets();
@@ -15,11 +16,17 @@ export default function BudgetScreen({navigation}) {
 
   const rawOutlaysObject = dataCollection.docs.find(x => x.id === "outlays")?.data()?? {};
 
+  const transactionsThisMonth = useContext(RecentTransactionsContext).filter(t => t.date >= startOfTheMonth.getTime());
+
+  const groupedTransactions = groupTransactionsByCategory(transactionsThisMonth);
+
   let expenseOutlaysArr = [];
+
+  const userGeneratedCategories = dataCollection.docs.find(x => x.id === "categories")?.data() ?? {};
 
   for (let key in rawOutlaysObject) {
 
-    const category = useCategory(key);
+    const category = DEFAULT_CATEGORIES[key]?? userGeneratedCategories[key]?? null;
 
     if (category.type !== "expenses")
       continue;
@@ -29,14 +36,6 @@ export default function BudgetScreen({navigation}) {
       outlay: rawOutlaysObject[key]
     })
   }
-
-  const transactionsThisMonth = useContext(RecentTransactionsContext).filter(t => t.date >= startOfTheMonth.getTime());
-
-  const groupedTransactions = transactionsThisMonth.reduce((acc, t) => {
-    (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
-
-    return acc;
-  }, {});
 
   expenseOutlaysArr.sort((a, b) => { 
     //Sorted by proportion of outlay filled up
@@ -84,7 +83,7 @@ export default function BudgetScreen({navigation}) {
       </Box>
 
       <TouchableOpacity onPress={() => navigation.navigate("Add Budget")}>
-        <Center w="100%" bg="#353436" h="12" rounded={100} position="absolute" bottom="6">
+        <Center w="100%" bg="#6a48fa" h="12" rounded={100} position="absolute" bottom="6">
           <Text color="white">ADD NEW BUDGET</Text>
         </Center>
       </TouchableOpacity>

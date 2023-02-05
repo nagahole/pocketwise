@@ -102,18 +102,9 @@ export default function StatsScreen({navigation}) {
           <ExpenseCategoryListItem 
             {...item}
             onPress={() => { 
-              let dateMin = new Date();
-              dateMin.setHours(0,0,0,0);
-              dateMin.setDate(1);
+              let dateMin = moment().startOf("month").toDate();
 
-              let dateMax = new Date();
-              dateMax.setHours(0,0,0,0);
-              dateMax.setDate(1);
-              if (dateMax.getMonth() == 11) {
-                dateMax = new Date(dateMax.getFullYear() + 1, 0, 1);
-              } else {
-                dateMax = new Date(dateMax.getFullYear(), dateMax.getMonth() + 1, 1);
-              }
+              let dateMax = moment().startOf("month").add(1, "month").toDate();
 
               navigation.navigate("See Transactions", { 
                 category: item.categoryID, 
@@ -182,6 +173,7 @@ export default function StatsScreen({navigation}) {
                 />
                 <VictoryAxis 
                   tickCount={4}
+                  tickFormat={t => t < 0.05? "" : t}
                   dependentAxis
                   style={{
                     grid: {

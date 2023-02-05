@@ -5,63 +5,13 @@ import BudgetItemWidget from '../components/BudgetItemWidget';
 import SwitchSelector from "react-native-switch-selector";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { faker } from '@faker-js/faker';
 import TransactionItem from '../components/TransactionItem';
-import { Alert, Animated, Dimensions } from 'react-native';
-import { DataContext, RecentTransactionsContext, startOfTheMonth, transactionsRef } from '../stacks/MainAppStack';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
-import firestore from "@react-native-firebase/firestore";
-import auth from "@react-native-firebase/auth";
+import { Animated, Dimensions } from 'react-native';
+import { DataContext, RecentTransactionsContext, startOfTheMonth } from '../stacks/MainAppStack';
 import { RECENT_TRANSACTIONS_TO_SHOW, SHOW_PARALLAX_OBJECTS } from '../data/Constants';
 import DEFAULT_CATEGORIES from '../data/DefaultCategories';
-import useCategory from '../hooks/useCategory';
 import { lighten } from 'color2k';
-
-//#region fake data
-export const FAKEBUDGETDETAILSDATA = [
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-  {
-    label: faker.commerce.department(),
-    iconName: "fa-solid fa-shirt",
-    budgetPerMonth: parseFloat(faker.finance.amount(40,250, 0)),
-  },
-]
-
-//#endregion
+import { groupTransactionsByCategory } from '../../utils/NagaUtils';
 
 export default function HomeScreen({navigation}) {
   const insets = useSafeAreaInsets();
@@ -72,13 +22,15 @@ export default function HomeScreen({navigation}) {
 
   const dataCollection = useContext(DataContext);
 
-  const rawOutlaysObject = dataCollection.docs.find(x => x.id === "outlays")?.data()?? {};
+  const rawOutlaysObject = dataCollection?.docs.find(x => x.id === "outlays")?.data()?? {};
 
   let expenseOutlaysArr = [];
 
+  const userGeneratedCategories = dataCollection?.docs.find(x => x.id === "categories")?.data() ?? {};
+
   for (let key in rawOutlaysObject) {
 
-    const category = useCategory(key);
+    const category = DEFAULT_CATEGORIES[key]?? userGeneratedCategories[key]?? null;
 
     if (category.type !== "expenses")
       continue;
@@ -91,11 +43,7 @@ export default function HomeScreen({navigation}) {
 
   const transactionsThisMonth = useContext(RecentTransactionsContext).filter(t => t.date >= startOfTheMonth.getTime());
 
-  const groupedTransactions = transactionsThisMonth.reduce((acc, t) => {
-    (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
-
-    return acc;
-  }, {});
+  const groupedTransactions = groupTransactionsByCategory(transactionsThisMonth);
 
   expenseOutlaysArr.sort((a, b) => { 
     //Sorted by budget per month
@@ -106,7 +54,7 @@ export default function HomeScreen({navigation}) {
   });
 
   function handleSeeAllButton() {
-    navigation.navigate("All Transactions");
+    navigation.navigate("See Transactions", { category: "all", dateRange: "all" });
   }
 
   return (

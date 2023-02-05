@@ -170,8 +170,6 @@ export default function EditTransactionScreen({navigation, route}) {
 
     setButtonEnabled(false);
 
-    console.log(`Date: ${date}, initialDate: ${initialDate.current}`);
-
     let writeDate = 
       date === initialDate.current
       ? transactionInfo.date
@@ -200,7 +198,7 @@ export default function EditTransactionScreen({navigation, route}) {
         setButtonEnabled(true);
         route.params.onFinishEditing(transactionObj);
         navigation.goBack();
-        
+
       })
       .catch(error => {
         setButtonEnabled(true);

@@ -3,7 +3,7 @@ const { useContext } = require("react");
 const { DataContext } = require("../stacks/MainAppStack");
 
 export default function useCategory(id) {
-  const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
+  const userGeneratedCategories = useContext(DataContext)?.docs.find(x => x.id === "categories")?.data() ?? {};
 
-  return DEFAULT_CATEGORIES[id]?? userGeneratedCategories[id];
+  return DEFAULT_CATEGORIES[id]?? userGeneratedCategories[id]?? DEFAULT_CATEGORIES.expense_bills;
 }

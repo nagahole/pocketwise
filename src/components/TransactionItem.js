@@ -4,14 +4,14 @@ import { transparentize } from "color2k";
 import { useRef } from "react";
 import useCategory from "../hooks/useCategory";
 import { RectButton, Swipeable } from "react-native-gesture-handler";
-import { Alert, Animated, StyleSheet } from "react-native";
+import { Alert, Animated, LayoutAnimation, StyleSheet } from "react-native";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
 export default function TransactionItem({ 
   id, reference, categoryID, amount, type, iconSize=22, swipeable = true, date,
-  onItemDelete = () => {}, onItemEdit = () => {}
+  onItemDelete = () => {}, onItemEdit = () => {}, configLayoutOnDelete = true
 }) {
 
   const category = useCategory(categoryID);
@@ -22,7 +22,6 @@ export default function TransactionItem({
 
   const component = (
     <Box
-      key={id}
       bg="white"
       borderRadius="20"
       p="2.5"
@@ -142,6 +141,20 @@ export default function TransactionItem({
                   text: "Delete",
                   style: "destructive",
                   onPress() {
+
+                    if (configLayoutOnDelete) {
+                      LayoutAnimation.configureNext({
+                        duration: 300,
+                        update: {
+                          type: "easeInEaseOut"
+                        },
+                        delete: {
+                          type: "linear",
+                          property: "opacity"
+                        }
+                      });
+                    }
+                    
                     firestore()
                       .collection("users")
                       .doc(auth().currentUser.uid)

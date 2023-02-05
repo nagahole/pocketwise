@@ -20,7 +20,7 @@ const DEFAULT_CATEGORIES = {
   }, 
   'expense_eating out': {
     color: COLORS.orange, 
-    icon: "fa-solid fa-burger", 
+    icon: "fa-solid fa-bell-concierge", 
     id: "expense_eating out", 
     name: "Eating out", 
     type: "expenses"

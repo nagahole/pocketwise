@@ -1,75 +1,90 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AspectRatio, Box, Button, Center, FlatList, HStack, Select, Text, VStack } from "native-base";
-import { useContext, useEffect } from "react";
-import { LayoutAnimation } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { useSafeAreaInsets } from "react-native-safe-area-context";import { VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
+import { useContext, useEffect, useRef, useState } from "react";
+import { LayoutAnimation, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ExpenseCategoryListItem from "../components/ExpenseCategoryListItem";
-import { RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
-
-const FAKEDATA = [
-  {
-    label: "Food",
-    iconName: "fa-solid fa-bowl-food"
-  },
-  {
-    label: "Clothes",
-    iconName: "fa-solid fa-shirt"
-  },
-  {
-    label: "Eating out",
-    iconName: "fa-solid fa-burger"
-  },
-  {
-    label: "Transport",
-    iconName: "fa-solid fa-taxi"
-  },
-  {
-    label: "Tech",
-    iconName: "fa-solid fa-laptop"
-  },
-  {
-    label: "Health",
-    iconName: "fa-regular fa-heart"
-  },
-]
+import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+import { UNITS_TO_GRAPH } from "../data/Constants";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import moment from "moment";
+import { db } from "../firebase";
+import { groupTransactionsByCategory, getExpenseGroupsArr, getDays, groupTransactionsByTime as groupTransactionsByTime, groupTransactionsByTimeToGraphArr } from "../../utils/NagaUtils";
 
 export default function StatsScreen({navigation}) {
   const insets = useSafeAreaInsets();
 
   const recentTransactions = useContext(RecentTransactionsContext);
 
-  const thisMonthsTransactions = recentTransactions.filter(x => x.date > startOfTheMonth.getTime());
+  const previousMonthsTransactionsQuery = (
+    db
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("transactions")
+      .where("type", "==", "expenses")
+      .orderBy("date")
+      .startAt(moment(startOfTheMonth).subtract(UNITS_TO_GRAPH - 1, "month").unix() * 1000)
+      .endBefore(startOfTheMonth.getTime())
+  )
 
-  //Map to avoid mutating original array
-  const groupedExpenses = thisMonthsTransactions.map(x => x).filter(x => x.type === "expenses").reduce((acc, t) => {
-    (acc[t.categoryID] = acc[t.categoryID] || []).push(t);
+  const [previousMonthsExpenses] = useCollectionData(previousMonthsTransactionsQuery);
 
-    return acc;
-  }, {});
+  const [expenseGroupsArr, setExpenseGroupsArr] = useState([]);
+  const [allMonthsExpenses, setAllMonthsExpenses] = useState([]);
 
-  let expenseGroupsArr = Object.values(groupedExpenses).sort((a, b) => {
-    //Sum of a's transactions > sum of b's transactions
-    return -a.reduce((acc, t) => acc + t.amount, 0) + b.reduce((acc, t) => acc + t.amount, 0);
-  });
+  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
+  const [weeklyExpenses, setWeeklyExpenses] = useState([]);
+  const [dailyExpenses, setDailyExpenses] = useState([]);
 
-  let categoryAmounts = {};
+  const [monthlyBudgetData, setMonthlyBudgetData] = useState([]);
+  const [weeklyBudgetData, setWeeklyBudgetData] = useState([]);
+  const [dailyBudgetData, setDailyBudgetData] = useState([]);
 
-  let totalAmount = expenseGroupsArr.reduce((acc, categoryGroup) => {
-    let categoryAmount = categoryGroup.reduce((acc, t) => acc + t.amount, 0);
-    categoryAmounts[categoryGroup[0].categoryID] = categoryAmount;
-    return acc + categoryAmount
-  }, 0);
+  const outlays = useContext(DataContext).docs.find(x => x.id === "outlays")?.data() ?? {};
 
-  //Right now is an array of array of transactions
-  expenseGroupsArr = expenseGroupsArr.map(categoryGroup => {
-    return {
-      categoryID: categoryGroup[0].categoryID,
-      amount: categoryAmounts[categoryGroup[0].categoryID],
-      numberOfTransactions: categoryGroup.length,
-      percentageOfTotal: categoryAmounts[categoryGroup[0].categoryID] / totalAmount * 100
-    }
-  });
+  const budgetThisMonth = Object.values(outlays).reduce((acc, amount) => acc + amount, 0);
+
+  const daysThisMonth = getDays(new Date().getFullYear(), new Date().getMonth() + 1);
+
+  const [groupBy, setGroupBy] = useState("months");
+
+  useEffect(() => {
+    let thisMonthsExpenses = recentTransactions.filter(x => x.date > startOfTheMonth.getTime() && x.type === "expenses");
+
+    setExpenseGroupsArr(getExpenseGroupsArr(groupTransactionsByCategory(thisMonthsExpenses))[0]);
+    setAllMonthsExpenses(thisMonthsExpenses.concat(previousMonthsExpenses?? []));
+
+  }, [recentTransactions, previousMonthsExpenses])
+
+  useEffect(() => {
+
+    let _monthlyExpenses = groupTransactionsByTimeToGraphArr(allMonthsExpenses, "month", UNITS_TO_GRAPH);
+    let _weeklyExpenses = groupTransactionsByTimeToGraphArr(allMonthsExpenses, "week", UNITS_TO_GRAPH);
+    let _dailyExpenses = groupTransactionsByTimeToGraphArr(allMonthsExpenses, "day", UNITS_TO_GRAPH);
+    
+    setMonthlyExpenses(_monthlyExpenses);
+    setWeeklyExpenses(_weeklyExpenses);
+    setDailyExpenses(_dailyExpenses);
+
+    setMonthlyBudgetData(_monthlyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth })));
+    setWeeklyBudgetData(_weeklyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth / ( daysThisMonth / 7 ) })));
+    setDailyBudgetData(_dailyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth / daysThisMonth })));
+
+  }, [allMonthsExpenses])
+
+  function getCurrentExpenseData() {
+    if (groupBy === "months") return monthlyExpenses
+    else if (groupBy === "weeks") return weeklyExpenses
+    else if (groupBy === "days") return dailyExpenses
+  }
+
+  function getCurrentBudgetData() {
+    if (groupBy === "months") return monthlyBudgetData;
+    else if (groupBy === "weeks") return weeklyBudgetData;
+    else if (groupBy === "days") return dailyBudgetData;
+  }
 
   return (
     <Box
@@ -82,11 +97,37 @@ export default function StatsScreen({navigation}) {
     >
       <FlatList
         data={expenseGroupsArr}
-        renderItem={({item}) => <ExpenseCategoryListItem {...item}/>}
+        keyExtractor={item => item.categoryID}
+        renderItem={({item}) => (
+          <ExpenseCategoryListItem 
+            {...item}
+            onPress={() => { 
+              let dateMin = new Date();
+              dateMin.setHours(0,0,0,0);
+              dateMin.setDate(1);
+
+              let dateMax = new Date();
+              dateMax.setHours(0,0,0,0);
+              dateMax.setDate(1);
+              if (dateMax.getMonth() == 11) {
+                dateMax = new Date(dateMax.getFullYear() + 1, 0, 1);
+              } else {
+                dateMax = new Date(dateMax.getFullYear(), dateMax.getMonth() + 1, 1);
+              }
+
+              navigation.navigate("See Transactions", { 
+                category: item.categoryID, 
+                dateRange: {
+                  min: dateMin.getTime(),
+                  max: Math.min(dateMax.getTime(), Date.now())
+                }
+              })
+            }}
+          />
+        )}
         contentContainerStyle={{
           padding: 15
         }}
-        keyExtractor={item => item.categoryID}
         ListHeaderComponent={(
           <Box py="3">
             <HStack justifyContent="space-between" alignItems="center" px="3">
@@ -108,31 +149,75 @@ export default function StatsScreen({navigation}) {
                 px="4"
                 rounded="15"
                 placeholder="Graph by..."
+                defaultValue={groupBy}
               >
-                <Select.Item label="By days" value="days"/>
-                <Select.Item label="By weeks" value="weeks"/>
-                <Select.Item label="By months" value="months"/>
+                <Select.Item label="By days" value="days" onPress={() => setGroupBy("days")}/>
+                <Select.Item label="By weeks" value="weeks" onPress={() => setGroupBy("weeks")}/>
+                <Select.Item label="By months" value="months" onPress={() => setGroupBy("months")}/>
               </Select>
             </Box>
 
-            <Box w="100%" h="56" overflow="visible">
+            <Box w="100%" h="56" overflow="visible" style={{ marginHorizontal: -15}}>
               <VictoryChart
                 colorScale="qualitative"
                 padding={{
                   top: 40,
-                  left: 27,
+                  left: 47,
                   bottom: 95,
                   right: 40
                 }}
+
               >
+                <VictoryAxis
+                  tickFormat={t => moment(t).format(
+                    groupBy === "months"
+                    ? "MMM"
+                    : groupBy === "weeks"
+                    ? "MMM D"
+                    : "ddd"
+                  )}
+                  tickValues={
+                    getCurrentExpenseData().map(obj => obj.x)
+                  }
+                />
+                <VictoryAxis 
+                  tickCount={4}
+                  dependentAxis
+                  style={{
+                    grid: {
+                      stroke: "rgba(0,0,0,0.08)",
+                      strokeWidth: 1
+                    },
+                  }}
+                />
                 <VictoryGroup
                   offset={15}
                 >
                   <VictoryBar
-                    data={[{ x: 1, y: 1 }, { x: 2, y: 42 }, { x: 4, y: 5}, { x:4, y:6}, {x:2, y:1}, {x:6, y:50}]}
+                    data={getCurrentBudgetData()}
+                    cornerRadius={{ topLeft: 6, topRight: 6}}
+                    style={{
+                      data: {
+                        fill: "#31C530"
+                      }
+                    }}
+                    animate={{
+                      duration: 1000,
+                      easing: 'exp'
+                    }}
                   />
                   <VictoryBar
-                    data={[{ x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 5}, { x:5, y:7}, {x:5, y:4}, {x:6, y:1}]}
+                    data={getCurrentExpenseData()}
+                    cornerRadius={{ topLeft: 6, topRight: 6}}
+                    style={{
+                      data: {
+                        fill: "#E86060",
+                      }
+                    }}
+                    animate={{
+                      duration: 1000,
+                      easing: 'exp'
+                    }}
                   />
                 </VictoryGroup>
               </VictoryChart>
@@ -140,8 +225,8 @@ export default function StatsScreen({navigation}) {
             
             <Box px="3">
               <TouchableOpacity onPress={() => navigation.navigate("Detailed Analytics")}>
-                <Center w="100%" h="12" bg="#E8E6E8" mt="5" rounded={100}>
-                  <Text fontWeight="600" fontSize="15">DETAILED ANALYTICS</Text>
+                <Center w="100%" h="12" bg="#6a48fa" mt="5" rounded={100}>
+                  <Text fontWeight="600" fontSize="15" color="white">DETAILED ANALYTICS</Text>
                 </Center>
               </TouchableOpacity>
             </Box>

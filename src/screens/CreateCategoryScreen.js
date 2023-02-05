@@ -1,24 +1,29 @@
 import { Box, Button, Center, HStack, Input, ScrollView, Text, VStack } from "native-base";
 import BackButton from "../components/BackButton";
-import { SWITCH_OPTIONS } from "./AddTransactionScreen";
-import SwitchSelector from "react-native-switch-selector";
 import { Alert, TouchableOpacity } from "react-native";
 import IconGrid from "../components/IconGrid";
 import COLORS from "../data/Colors";
 import ICONS from "../data/Icons";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { transparentize } from "color2k";
 import { v4 as uuidv4 } from 'uuid';
+import useCategory from "../hooks/useCategory";
+import { DataContext } from "../stacks/MainAppStack";
 
-export default function CreateCategoryScreen({navigation}) {
+export default function CreateCategoryScreen({navigation, route}) {
+
+  const isEditMode = route.params?.mode === "edit"
+  const outlays = useContext(DataContext).docs?.find(x => x.id === "outlays")?.data() ?? {};
+
+  const category = useCategory(isEditMode? route.params.id : "");
 
   const [type, setType] = useState("expenses");
-  const [name, setName] = useState("");
-  const [outlay, setOutlay] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState();
-  const [selectedColor, setSelectedColor] = useState("gray");
+  const [name, setName] = useState(isEditMode? category.name : "");
+  const [outlay, setOutlay] = useState(isEditMode? (outlays[category.id]?.toString()?? "" ): "");
+  const [selectedIcon, setSelectedIcon] = useState(isEditMode? category.icon : null);
+  const [selectedColor, setSelectedColor] = useState(isEditMode? category.color : "gray");
 
   const [buttonEnabled, setButtonEnabled] = useState(true);
 
@@ -70,8 +75,6 @@ export default function CreateCategoryScreen({navigation}) {
     if (outlay === "")
       return;
 
-    //No need to add outlay object if user didn't specify outlay
-
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
@@ -79,6 +82,152 @@ export default function CreateCategoryScreen({navigation}) {
       .doc("outlays")
       .set({
         [id]: parseFloat(outlay)
+      }, {merge: true})
+      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+  }
+
+  function handleRemoveCategory() {
+    Alert.alert(
+      "Warning",
+      "Deleting this category will remove any and all transactions of category. Continue?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress() {
+            deleteCategory(category.id)
+          }
+        }
+      ]
+    )
+  }
+
+  function deleteCategory(id) {
+    setButtonEnabled(false);
+
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("transactions")
+      .where("categoryID", "==", id)
+      .get()
+      .then(querySnapshot => {
+
+        if (querySnapshot.docs.length === 0) {
+          removeCategoryField(id);
+          return;
+        }
+
+        querySnapshot.forEach((documentSnapshot, index) => {
+          firestore()
+            .collection("users")
+            .doc(auth().currentUser.uid)
+            .collection("transactions")
+            .doc(documentSnapshot.id)
+            .delete()
+            .then(() => {
+              console.log("Deleted document", documentSnapshot.id);
+
+              //If just finished deleting last snapshot
+              //Delete the category
+              if (index === querySnapshot.docs.length - 1) {
+                removeCategoryField(id);
+              }
+            })
+            .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+        });
+      })
+      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("outlays")
+      .set({
+        [id]: firestore.FieldValue.delete()
+      }, {merge: true})
+      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+  }
+
+  function removeCategoryField(id) {
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("categories")
+      .set({
+        [id]: firestore.FieldValue.delete()
+      }, {merge: true})
+      .then(() => {
+
+        setButtonEnabled(true);
+        navigation.goBack();
+
+      })
+      .catch(error => {
+        setButtonEnabled(true);
+        Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
+      });
+  }
+
+  function handleEditCategory() {
+    if (name === "") {
+      Alert.alert("Please set a name");
+      return;
+    }
+
+    if (selectedIcon == undefined) {
+      Alert.alert("Please select an icon");
+      return;
+    }
+
+    if (selectedColor === "gray") {
+      Alert.alert("Please select a color");
+      return;
+    }
+
+    setButtonEnabled(false);
+
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("categories")
+      .set({
+        [category.id]: {
+          type,
+          name,
+          icon: selectedIcon,
+          color: selectedColor,
+          id: category.id
+        }
+      }, {merge: true})
+      .then(() => {
+
+        setButtonEnabled(true);
+        navigation.goBack();
+
+      })
+      .catch(error => {
+        setButtonEnabled(true);
+        Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
+      });
+
+    if (outlay === "")
+      return;
+
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("outlays")
+      .set({
+        [category.id]: parseFloat(outlay)
       }, {merge: true})
       .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
   }
@@ -94,33 +243,12 @@ export default function CreateCategoryScreen({navigation}) {
       <Box flex={1}>
         <Box>
           <BackButton/>
-          <Text fontWeight="600" fontSize={28} mb="3">Create category</Text>
-          <SwitchSelector
-            options={SWITCH_OPTIONS}
-            initial={0}
-            onPress={setType}
-            buttonColor="white"
-            backgroundColor="#F2F1F8"
-            selectedColor="#6C4AFA"
-            hasPadding
-            valuePadding={2}
-            borderColor="#F2F1F8"
-            textColor="#242D4C"
-            height={45}
-            fontSize={16}
-            textStyle={{
-              fontWeight: '500'
-            }}
-            selectedTextStyle={{
-              fontWeight: '500'
-            }}
-          />
+          <Text fontWeight="600" fontSize={28} mb="3">{isEditMode? "Edit category" : "Create category"}</Text>
           <Input
             placeholder="Name"
             value={name}
             onChangeText={setName}
             keyboardType="decimal-pad"
-            mt="5"
             rounded={20}
             variant="filled"
             style={{
@@ -185,7 +313,7 @@ export default function CreateCategoryScreen({navigation}) {
         </Box>
       </Box>
       <Box pb="2.5" style={{
-        height: 175
+        height: isEditMode? 175 + 60 : 175
       }}>
         <VStack space={4} h="100%">
           <VStack space={6} flex={1}>
@@ -202,9 +330,38 @@ export default function CreateCategoryScreen({navigation}) {
               }
             </HStack>
           </VStack>
+          {
+            isEditMode && (
+              <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35}}>
+                <TouchableOpacity
+                  disabled={!buttonEnabled}
+                  onPress={handleRemoveCategory}
+                >
+                  <Center 
+                    w="100%" 
+                    h="100%" 
+                    rounded={100} 
+                    bg="white"
+                    borderWidth={2}
+                  >
+                    <Text fontWeight="500" fontSize={16}>REMOVE CATEGORY</Text>
+                  </Center>
+                </TouchableOpacity>
+              </Box>
+            )
+          }
+
           <Box style={{ height: 55 }}>
-            <Button disabled={!buttonEnabled} w="100%" h="100%" rounded={100} bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} _pressed={{ backgroundColor: 'black' }} onPress={handleAddCategory}>
-              <Text color="white" fontWeight="500" fontSize={16}>ADD CATEGORY</Text>
+            <Button 
+              disabled={!buttonEnabled} 
+              w="100%" 
+              h="100%" 
+              rounded={100} 
+              bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} 
+              _pressed={{ backgroundColor: 'black' }} 
+              onPress={isEditMode? handleEditCategory : handleAddCategory}
+            >
+              <Text color="white" fontWeight="500" fontSize={16}>{isEditMode? "SAVE CHANGES" : "ADD CATEGORY"}</Text>
             </Button>
           </Box>
           

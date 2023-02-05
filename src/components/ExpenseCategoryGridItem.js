@@ -4,10 +4,12 @@ import { AspectRatio, Box, Center, Text, VStack } from "native-base";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function ExpenseCategoryGridItem({
-  size = 60, label, iconName, addNew, iconSize=20, onPress, selected = false, marginBottom = 10, color = "#777777"
+  size = 60, label, iconName, addNew, iconSize=20, onPress, 
+  selected = false, marginBottom = 10, color = "#777777",
+  onLongPress
 }) {
   return (
-    <TouchableOpacity onPress={onPress?? null} style={{marginBottom}}>
+    <TouchableOpacity onPress={onPress} style={{marginBottom}} onLongPress={onLongPress}>
       <VStack alignItems="center" space={1.5}>
         <Center
           borderWidth={

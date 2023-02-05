@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { FAKERECENTTRANSACTIONSDATA } from "./HomeScreen";
 import TransactionItem from "../components/TransactionItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
 import { getRandomNumber, interpolateColors } from "../../utils/ColorGenerator";
 import * as d3 from "d3";
@@ -21,37 +21,135 @@ import { groupTransactionsByCategory, getExpenseGroupsArr } from "../../utils/Na
 export default function DetailedAnalyticsScreen({navigation}) {
   
   const recentTransactions = useContext(RecentTransactionsContext);
-  const transactionsThisMonth = recentTransactions.filter(x => x.date > startOfTheMonth.getTime());
 
-  const groupedTransactions = groupTransactionsByCategory(transactionsThisMonth);
+  const [colors, setColors] = useState([]);
 
-  let [expenseGroupsArr, totalAmount] = getExpenseGroupsArr(groupedTransactions);
+  const [monthsExpenseGroupsArr, setMonthsExpenseGroupsArr] = useState([]);
+  const [weeksExpenseGroupsArr, setWeeksExpenseGroupsArr] = useState([]);
+  const [daysExpenseGroupsArr, setDaysExpenseGroupsArr] = useState([]);
 
-  const arrayLength = expenseGroupsArr.length;
-  const colorScale = d3.interpolateWarm;
-  const colorRangeInfo = {
-    colorStart: 0,
-    colorEnd: 1,
-    useEndAsStart: false,
-  }; 
+  const [monthsData, setMonthsData] = useState([]);
+  const [weeksData, setWeeksData] = useState([]);
+  const [daysData, setDaysData] = useState([]);
 
-  const colors = interpolateColors(arrayLength, colorScale, colorRangeInfo);
+  const [monthsTotalAmount, setMonthsTotalAmount] = useState(0);
+  const [weeksTotalAmount, setWeeksTotalAmount] = useState(0);
+  const [daysTotalAmount, setDaysTotalAmount] = useState(0);
 
   const userGeneratedCategories = useContext(DataContext).docs.find(x => x.id === "categories")?.data() ?? {};
 
-  let data = expenseGroupsArr.map(expGroup => {
-    let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
+  const [groupBy, setGroupBy] = useState("months");
 
-    return {
-      x: category.name.capitalize(),
-      y: expGroup.amount
+  useEffect(() => {
+    const transactionsThisMonth = recentTransactions.filter(x => x.date >= startOfTheMonth.getTime());
+    const transactionsThisWeek = recentTransactions.filter(x => x.date >= moment().startOf("isoWeek").unix() * 1000);
+    const transactionsToday = recentTransactions.filter(x => x.date >= moment().startOf("day").unix() * 1000);
+
+    const [_monthsExpenseGroupsArr, _monthsTotalAmount] = 
+      getExpenseGroupsArr(groupTransactionsByCategory(transactionsThisMonth));
+
+    const [_weeksExpenseGroupsArr, _weeksTotalAmount] = 
+      getExpenseGroupsArr(groupTransactionsByCategory(transactionsThisWeek));
+
+    const [_daysExpenseGroupsArr, _daysTotalAmount] = 
+      getExpenseGroupsArr(groupTransactionsByCategory(transactionsToday));
+
+    setMonthsExpenseGroupsArr(_monthsExpenseGroupsArr);
+    setWeeksExpenseGroupsArr(_weeksExpenseGroupsArr);
+    setDaysExpenseGroupsArr(_daysExpenseGroupsArr);
+
+    setMonthsTotalAmount(_monthsTotalAmount);
+    setWeeksTotalAmount(_weeksTotalAmount);
+    setDaysTotalAmount(_daysTotalAmount);
+
+    setMonthsData(_monthsExpenseGroupsArr.map(expGroup => {
+      let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
+  
+      return {
+        x: category.name.capitalize(),
+        y: expGroup.amount
+      }
+    }));
+
+    setWeeksData(_weeksExpenseGroupsArr.map(expGroup => {
+      let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
+  
+      return {
+        x: category.name.capitalize(),
+        y: expGroup.amount
+      }
+    }));
+
+    setDaysData(_daysExpenseGroupsArr.map(expGroup => {
+      let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
+  
+      return {
+        x: category.name.capitalize(),
+        y: expGroup.amount
+      }
+    }));
+
+    generateColors(_monthsExpenseGroupsArr, _weeksExpenseGroupsArr, _daysExpenseGroupsArr);
+
+  }, [recentTransactions]);
+
+  const didMount = useRef(true);
+
+  useEffect(() => {
+    if (didMount.current) {
+      didMount.current = false;
+      return;
     }
-  })
+    generateColors();
+  }, [groupBy]);
+
+  function generateColors(month = monthsExpenseGroupsArr, week = weeksExpenseGroupsArr, day = daysExpenseGroupsArr) {
+    const colorRangeInfo = {
+      colorStart: 0,
+      colorEnd: 1,
+      useEndAsStart: false,
+    }; 
+
+    setColors(interpolateColors(
+      groupBy === "months"
+      ? month.length
+      : groupBy === "weeks"
+      ? week.length
+      : day.length, 
+      d3.interpolateWarm, 
+      colorRangeInfo));
+  }
 
   const insets = useSafeAreaInsets();
 
+  function getGraphData() {
+    if (groupBy === "months") return monthsData
+    else if (groupBy === "weeks") return weeksData
+    else if (groupBy === "days") return daysData
+  }
+
+  function getLegendData() {
+    if (groupBy === "months") return monthsExpenseGroupsArr
+    else if (groupBy === "weeks") return weeksExpenseGroupsArr
+    else if (groupBy === "days") return daysExpenseGroupsArr
+  }
+
+  function getTotalAmount() {
+    if (groupBy === "months") return monthsTotalAmount
+    else if (groupBy === "weeks") return weeksTotalAmount
+    else if (groupBy === "days") return daysTotalAmount
+  }
+
   function handleSeeMore() {
     navigation.navigate("See Transactions", { category: "all", dateRange: "all" })
+  }
+
+  function getTimeText() {
+    if (groupBy === "months") return moment().format("MMMM, YYYY")
+    else if (groupBy === "weeks") return ( 
+      `${moment().startOf("isoWeek").format("MMM Do")} - ${moment().format("MMM Do")}`
+    ) 
+    else if (groupBy === "days") return moment().format("MMMM Do")
   }
 
   return (
@@ -79,11 +177,11 @@ export default function DetailedAnalyticsScreen({navigation}) {
               px="4"
               rounded="15"
               placeholder="Graph by..."
-              defaultValue="months"
+              defaultValue={groupBy}
             >
-              <Select.Item label="By days" value="days"/>
-              <Select.Item label="By weeks" value="weeks"/>
-              <Select.Item label="By months" value="months"/>
+              <Select.Item label="By days" value="days" onPress={() => setGroupBy("days")}/>
+              <Select.Item label="By weeks" value="weeks" onPress={() => setGroupBy("weeks")}/>
+              <Select.Item label="By months" value="months" onPress={() => setGroupBy("months")}/>
             </Select>
             <Box mt="4">
               {/* <SwitchSelector
@@ -112,7 +210,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                 <Svg viewBox={`0 0 ${Dimensions.get('window').width - 40} 400`}>
                   <VictoryPie 
                     colorScale={colors}
-                    data={data}
+                    data={getGraphData()}
                     labels={() => null}
                     padding={{
                       right: 40,
@@ -129,7 +227,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                   />
                   <VictoryLabel 
                     textAnchor="middle" 
-                    text={`$${Math.round(totalAmount)}`}
+                    text={`$${Math.round(getTotalAmount())}`}
                     x={(Dimensions.get('window').width - 40)* 0.49}
                     y={200}
                     style={{
@@ -148,7 +246,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                   />
                   <VictoryLabel 
                     textAnchor="middle" 
-                    text={moment().format("MMMM, YYYY")}
+                    text={getTimeText()}
                     x={(Dimensions.get('window').width - 40) * 0.49}
                     y={250}
                     style={{
@@ -159,7 +257,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
               </Box>
               <Box flexDir="row" flexWrap="wrap" mt="3">
                 {
-                  expenseGroupsArr.map((expGroup, i) => {
+                  getLegendData().map((expGroup, i) => {
                     let category = DEFAULT_CATEGORIES[expGroup.categoryID]?? userGeneratedCategories[expGroup.categoryID]?? null;
                     return (
                       <Circle borderColor="#E4E3E3" borderWidth={1} py="0.5" px="2" mb="2" mr="2" key={category.id}>

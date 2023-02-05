@@ -12,19 +12,17 @@ import { createContext, useEffect, useRef, useState } from "react";
 import { RECENT_TRANSACTIONS_TO_SHOW, SPLASH_SCREEN_DURATION } from "../data/Constants";
 import SeeTransactionsScreen from "../screens/SeeTransactionsScreen";
 import EditTransactionScreen from "../screens/EditTransactionScreen";
-import { Box, Center, Text } from "native-base";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { Dimensions } from "react-native";
 import SplashScreen from "../screens/SplashScreen";
+import moment from "moment";
 
 const Stack = createNativeStackNavigator();
 
 export const RecentTransactionsContext = createContext([]);
 export const DataContext = createContext({});
 
-export const startOfTheMonth = new Date();
-startOfTheMonth.setDate(1);
-startOfTheMonth.setHours(0,0,0,0);
+export const startOfTheMonth = moment().startOf("month").toDate();
+
+export const weekBeforeStartOfTheMonth = moment(startOfTheMonth).startOf("isoWeek").toDate();
 
 // Maybe use useCollection instead of useCollectionData so I can use startAt and startAfter?
 export default function MainAppStack() {
@@ -36,27 +34,27 @@ export default function MainAppStack() {
     .doc(auth().currentUser.uid)
     .collection('transactions');
 
-  const transactionsThisMonthQuery = transactionsRef.where("date", ">=", startOfTheMonth.getTime()).orderBy('date', 'desc');
-  const [transactionsThisMonth] = useCollectionData(transactionsThisMonthQuery, {idField: 'id'});
+  const transactionsThisMonthQuery = transactionsRef.where("date", ">=", weekBeforeStartOfTheMonth.getTime()).orderBy('date', 'desc');
+  const [transactionsThisMonthPlusWeek] = useCollectionData(transactionsThisMonthQuery, {idField: 'id'});
 
-  const transactionsBeforeStartOfTheMonthQuery = 
+  const transactionsBeforeStartOfTheMonthPlusWeekQuery = 
     transactionsRef
-      .where("date", "<", startOfTheMonth.getTime())
+      .where("date", "<", weekBeforeStartOfTheMonth.getTime())
       .orderBy('date', "desc")
       .limit(RECENT_TRANSACTIONS_TO_SHOW);
     
-  const [transactionsBeforeStartOfTheMonth] = useCollectionData(transactionsBeforeStartOfTheMonthQuery, {idField: "id"});
+  const [transactionsBeforeStartOfTheMonthPlusWeek] = useCollectionData(transactionsBeforeStartOfTheMonthPlusWeekQuery, {idField: "id"});
 
   const dataQuery = db.collection('users').doc(auth().currentUser.uid).collection('data');
   const [dataCollection] = useCollection(dataQuery, {idField: 'id'});
 
   useEffect(() => {
 
-    if (transactionsThisMonth == undefined || transactionsBeforeStartOfTheMonth == undefined)
+    if (transactionsThisMonthPlusWeek == undefined || transactionsBeforeStartOfTheMonthPlusWeek == undefined)
       return 
 
-    setRecentTransactions(transactionsThisMonth.concat(transactionsBeforeStartOfTheMonth));
-  }, [transactionsThisMonth, transactionsBeforeStartOfTheMonth])
+    setRecentTransactions(transactionsThisMonthPlusWeek.concat(transactionsBeforeStartOfTheMonthPlusWeek));
+  }, [transactionsThisMonthPlusWeek, transactionsBeforeStartOfTheMonthPlusWeek])
 
   return (
     <DataContext.Provider value={dataCollection}>

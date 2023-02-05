@@ -34,7 +34,8 @@ export default function AddTransactionScreen({navigation}) {
         iconName: c.icon,
         label: c.name.capitalize(),
         value: c.id,
-        color: c.color
+        color: c.color,
+        userGenerated: false
       }));
 
   const INCOME_CATEGORIES = 
@@ -45,7 +46,8 @@ export default function AddTransactionScreen({navigation}) {
         iconName: c.icon,
         label: c.name.capitalize(),
         value: c.id,
-        color: c.color
+        color: c.color,
+        userGenerated: false
       }));
 
   const SAVING_CATEGORIES = 
@@ -56,7 +58,8 @@ export default function AddTransactionScreen({navigation}) {
         iconName: c.icon,
         label: c.name.capitalize(),
         value: c.id,
-        color: c.color
+        color: c.color,
+        userGenerated: false
       }));
 
   Object.values(userGeneratedCategories).forEach(c => {
@@ -67,6 +70,7 @@ export default function AddTransactionScreen({navigation}) {
         label: c.name,
         value: c.id,
         color: c.color,
+        userGenerated: true
       });
     } else if (c.type === "incomes") {
       INCOME_CATEGORIES.unshift({
@@ -74,13 +78,15 @@ export default function AddTransactionScreen({navigation}) {
         label: c.name,
         value: c.id,
         color: c.color,
+        userGenerated: true
       });
     } else if (c.type === "savings") {
       SAVING_CATEGORIES.unshift({
         iconName: c.icon,
         label: c.name,
         value: c.id,
-        color: c.color
+        color: c.color,
+        userGenerated: true
       });
     }
 
@@ -129,6 +135,8 @@ export default function AddTransactionScreen({navigation}) {
   const [date, setDate] = useState("today");
 
   const [buttonEnabled, setButtonEnabled] = useState(true);
+
+  const [isEditMode, setIsEditMode] = useState(false);
 
   function handleAddTransaction() {
 
@@ -213,6 +221,13 @@ export default function AddTransactionScreen({navigation}) {
     showDatePicker();
   }
 
+  function handleLongPress(item) {
+    if (!item.userGenerated)
+      return;
+
+    navigation.navigate("Create Category", { mode: "edit", id: item.value } );
+  }
+
   return (
     <Box
       safeArea
@@ -232,26 +247,6 @@ export default function AddTransactionScreen({navigation}) {
         <Box>
           <VStack space={3}>
             <Text fontWeight="600" fontSize={28}>Add transaction</Text>
-            {/* <SwitchSelector
-              options={SWITCH_OPTIONS}
-              initial={0}
-              onPress={value => setType(value)}
-              buttonColor="white"
-              backgroundColor="#F2F1F8"
-              selectedColor="#6C4AFA"
-              hasPadding
-              valuePadding={2}
-              borderColor="#F2F1F8"
-              textColor="#242D4C"
-              height={45}
-              fontSize={16}
-              textStyle={{
-                fontWeight: '500'
-              }}
-              selectedTextStyle={{
-                fontWeight: '500'
-              }}
-            /> */}
             <Input
               placeholder="Reference"
               value={reference}
@@ -315,8 +310,6 @@ export default function AddTransactionScreen({navigation}) {
             paddingVertical: 18
           }}>
             <SimpleGrid 
-              // setCategory={setCategory} 
-              // selectedCategory={category}
               itemDimension={((Dimensions.get('window').width - 16 * 2) / 4) - 10}
               spacing={0}
               data={
@@ -332,6 +325,8 @@ export default function AddTransactionScreen({navigation}) {
                 <ExpenseCategoryGridItem 
                   {...item} 
                   onPress={item.onPress?? (() => setCategoryID(item.value))} 
+                  onLongPress={() => handleLongPress(item)}
+                  isEditMode={isEditMode}
                   iconSize={20} 
                   marginBottom={15}
                   selected={categoryID === item.value}

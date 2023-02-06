@@ -1,4 +1,3 @@
-import "./src/firebase";
 import "./utils/NagaUtils";
 import { NavigationContainer } from '@react-navigation/native'
 import { NativeBaseProvider } from 'native-base'

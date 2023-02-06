@@ -73,6 +73,13 @@ const DEFAULT_CATEGORIES = {
     name: "Transport",
     type: "expenses"
   },
+  expense_entertainment: {
+    color: COLORS.violet,
+    icon: "fa-solid fa-gamepad",
+    id: "expense_entertainment",
+    name: "Entertainment",
+    type: "expenses"
+  },
   //#endregion
 
 

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AspectRatio, Box, Button, Circle, FlatList, HStack, ScrollView, Text, VStack } from 'native-base'
+import { AspectRatio, Box, Button, Center, Circle, FlatList, HStack, ScrollView, Text, VStack } from 'native-base'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BudgetItemWidget from '../components/BudgetItemWidget';
 import SwitchSelector from "react-native-switch-selector";
@@ -70,9 +70,9 @@ export default function HomeScreen({navigation}) {
         }}>
           <Box flex={1}>
             { /* Need an extra box because padding messes up flex={1} */}
-            <HStack w="100%" h="100%" px="5">
+            <HStack w="100%" h="100%" px="5" alignItems="center">
               <Box flex={1} alignItems="center" justifyContent="center">
-                <TouchableOpacity onPress={navigation.openDrawer}>
+                {/* <TouchableOpacity onPress={navigation.openDrawer}>
                   <Box w="100%" h="100%" p="2.5">
                     <AspectRatio ratio={1} w="100%">
                       <Circle borderWidth={1} w="110%" h="110%" borderColor="#957FFB">
@@ -80,17 +80,17 @@ export default function HomeScreen({navigation}) {
                       </Circle>
                     </AspectRatio>
                   </Box>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </Box>
               <Box flex={4} alignItems="center" justifyContent="center">
-                <Text fontSize={22} ml="1.5" color="white">Dashboard</Text>
+                <Text fontSize={22} color="white">Dashboard</Text>
               </Box>
               {/* Filler box to keep title centered */}
               <Box flex={1}></Box>
             </HStack>
           </Box>
           <Box flex={3.6}>
-            <VStack w="100%" h="100%" px="8" style={{ paddingTop: 25 }}>
+            <VStack w="100%" h="100%" px="8" style={{ paddingTop: 14 }}>
               <HStack space={2}>
                 <Text color="white" fontSize="40">$ {transactionsThisMonth.reduce((acc, t) => acc + t.amount, 0).toFixed(2)}</Text>
               </HStack>
@@ -115,7 +115,7 @@ export default function HomeScreen({navigation}) {
           }], {useNativeDriver: true})}
           scrollEventThrottle={5}
           contentContainerStyle={{
-            paddingHorizontal: 30
+            paddingHorizontal: 27
           }}
           ListHeaderComponent={(
             <>
@@ -184,6 +184,7 @@ export default function HomeScreen({navigation}) {
                     showsHorizontalScrollIndicator={false}
                     overflow="visible"
                     data={expenseOutlaysArr}
+                    keyExtractor={item => item.id}
                     renderItem={({item, index}) => (
                       <BudgetItemWidget 
                         first={index === 0}
@@ -195,10 +196,10 @@ export default function HomeScreen({navigation}) {
                     ListEmptyComponent={(
                       <Box 
                         style={{
-                          marginHorizontal: -30,
+                          marginHorizontal: -27,
                           width: Dimensions.get('window').width,
                           height: 200,
-                          paddingHorizontal: 50
+                          paddingHorizontal: 50,
                         }}
                       >
                         <Box flex="1" rounded={30} bg={lighten("#6a48fa", 0.05)} p="5" style={{
@@ -209,22 +210,20 @@ export default function HomeScreen({navigation}) {
                           <Text textAlign="center" fontWeight="600" fontSize="24" color="white">New here?</Text>
                           <Text textAlign="center" fontWeight="400" fontSize="16" color="white" mt="2">Start laying out your budget now!</Text>
 
-                          <Box flex={1} justifyContent="center" alignItems="center" mt="9" px="10">
-                            <Button
-                              bg="#FED9DA"
-                              _pressed={{
-                                backgroundColor: "#e0bfc0"
-                              }}
-                              rounded={100}
-                              w="100%"
-                              h="12"
-                              onPress={() => navigation.navigate("Budget")}
-                            >
-                              <HStack alignItems="center" space={1.5}>
-                                <FontAwesomeIcon color="#853B8A" icon="fa-solid fa-pencil" style={{ marginTop: 1 }}/>
-                                <Text color="#853B8A" fontSize={16} fontWeight="600">Create budget</Text>
-                              </HStack>
-                            </Button>
+                          <Box flex={1} justifyContent="center" alignItems="center" mt="9" px="0">
+                            <TouchableOpacity onPress={() => navigation.navigate("Budget")}>
+                              <Center
+                                bg="#FED9DA"
+                                rounded={100}
+                                w="48"
+                                h="12"
+                              >
+                                <HStack alignItems="center" space={1.5}>
+                                  <FontAwesomeIcon color="#853B8A" icon="fa-solid fa-pencil" style={{ marginTop: 1 }}/>
+                                  <Text color="#853B8A" fontSize={16} fontWeight="600">Create budget</Text>
+                                </HStack>
+                              </Center>
+                            </TouchableOpacity>
                           </Box>
                         </Box>
                       </Box>

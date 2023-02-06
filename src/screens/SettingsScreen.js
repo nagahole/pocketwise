@@ -42,9 +42,9 @@ export default function SettingsScreen({navigation}) {
         paddingTop: insets.top
       }}
     >
-      <ScrollView px="5" pt="6">
-        <Text fontWeight="bold" fontSize="32">Settings</Text>
-        <Box width="100%" rounded={20} px="5" py="2" bg="white" mt="5" 
+      <ScrollView style={{ paddingHorizontal: 27, paddingTop: 27 }}>
+        <Text fontWeight="600" fontSize="32">Settings</Text>
+        <Box width="100%" rounded={20} px="5" py="2" bg="white" mt="8" 
           style={{
             shadowColor: 'black',
             shadowRadius: 15,

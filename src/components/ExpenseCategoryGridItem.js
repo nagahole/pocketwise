@@ -15,21 +15,19 @@ export default function ExpenseCategoryGridItem({
           borderWidth={
             addNew
             ? 2.5
-            : selected
-            ? 2
             : 0
           }
           borderColor={addNew? "black" : darken(color, 0.1)}
-          bg={addNew? "white" : transparentize(color, 0.85)}
+          bg={addNew? "white" : selected? color : transparentize(color, 0.85)}
           rounded={size * 0.3}
           style={{
             width: size,
             height: size
           }}
         >
-          <FontAwesomeIcon icon={iconName} color={addNew? "black" : color} size={iconSize}/>
+          <FontAwesomeIcon icon={iconName} color={addNew? "black" : selected? "white" : color} size={iconSize}/>
         </Center>
-        <Text fontWeight="600" fontSize="13" textAlign="center">{label?? "name"}</Text>
+        <Text fontWeight="500" fontSize="12" textAlign="center" color={addNew? "black" : darken(color, 0.05)}>{label?? "name"}</Text>
       </VStack>
     </TouchableOpacity>
   )

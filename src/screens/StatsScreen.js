@@ -10,7 +10,6 @@ import auth from "@react-native-firebase/auth";
 import { UNITS_TO_GRAPH } from "../data/Constants";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import moment from "moment";
-import { db } from "../firebase";
 import { groupTransactionsByCategory, getExpenseGroupsArr, getDays, groupTransactionsByTime as groupTransactionsByTime, groupTransactionsByTimeToGraphArr } from "../../utils/NagaUtils";
 
 export default function StatsScreen({navigation}) {
@@ -18,18 +17,7 @@ export default function StatsScreen({navigation}) {
 
   const recentTransactions = useContext(RecentTransactionsContext);
 
-  const previousMonthsTransactionsQuery = (
-    db
-      .collection("users")
-      .doc(auth().currentUser.uid)
-      .collection("transactions")
-      .where("type", "==", "expenses")
-      .orderBy("date")
-      .startAt(moment(startOfTheMonth).subtract(UNITS_TO_GRAPH - 1, "month").unix() * 1000)
-      .endBefore(startOfTheMonth.getTime())
-  )
-
-  const [previousMonthsExpenses] = useCollectionData(previousMonthsTransactionsQuery);
+  const [previousMonthsExpenses, setPreviousMonthsExpenses] = useState([]);
 
   const [expenseGroupsArr, setExpenseGroupsArr] = useState([]);
   const [allMonthsExpenses, setAllMonthsExpenses] = useState([]);
@@ -51,6 +39,22 @@ export default function StatsScreen({navigation}) {
   const [groupBy, setGroupBy] = useState("months");
 
   useEffect(() => {
+    const subscriber = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("transactions")
+      .where("type", "==", "expenses")
+      .orderBy("date")
+      .startAt(moment(startOfTheMonth).subtract(UNITS_TO_GRAPH - 1, "month").unix() * 1000)
+      .endBefore(startOfTheMonth.getTime())
+      .onSnapshot(querySnapshot => {
+        setPreviousMonthsExpenses(querySnapshot.docs.map(documentSnapshot => documentSnapshot.data()));
+      });
+
+    return () => subscriber();
+  }, []);
+
+  useEffect(() => {
     let thisMonthsExpenses = recentTransactions.filter(x => x.date > startOfTheMonth.getTime() && x.type === "expenses");
 
     setExpenseGroupsArr(getExpenseGroupsArr(groupTransactionsByCategory(thisMonthsExpenses))[0]);
@@ -68,7 +72,7 @@ export default function StatsScreen({navigation}) {
     setWeeklyExpenses(_weeklyExpenses);
     setDailyExpenses(_dailyExpenses);
 
-    setMonthlyBudgetData(_monthlyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth })));
+    setMonthlyBudgetData(_monthlyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth, key: (obj.x * 2) })));
     setWeeklyBudgetData(_weeklyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth / ( daysThisMonth / 7 ) })));
     setDailyBudgetData(_dailyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth / daysThisMonth })));
 
@@ -99,40 +103,45 @@ export default function StatsScreen({navigation}) {
         data={expenseGroupsArr}
         keyExtractor={item => item.categoryID}
         renderItem={({item}) => (
-          <ExpenseCategoryListItem 
-            {...item}
-            onPress={() => { 
-              let dateMin = moment().startOf("month").toDate();
+          <Box style={{ marginHorizontal: -8 }}>
+            <ExpenseCategoryListItem 
+              {...item}
+              onPress={() => { 
+                let dateMin = moment().startOf("month").toDate();
 
-              let dateMax = moment().startOf("month").add(1, "month").toDate();
+                let dateMax = moment().startOf("month").add(1, "month").toDate();
 
-              navigation.navigate("See Transactions", { 
-                category: item.categoryID, 
-                dateRange: {
-                  min: dateMin.getTime(),
-                  max: Math.min(dateMax.getTime(), Date.now())
-                }
-              })
-            }}
-          />
+                navigation.navigate("See Transactions", { 
+                  category: item.categoryID, 
+                  dateRange: {
+                    min: dateMin.getTime(),
+                    max: Math.min(dateMax.getTime(), Date.now())
+                  }
+                })
+              }}
+            />
+          </Box>
         )}
         contentContainerStyle={{
-          padding: 15
+          padding: 27,
+          paddingHorizontal: 27
         }}
         ListHeaderComponent={(
-          <Box py="3">
-            <HStack justifyContent="space-between" alignItems="center" px="3">
-              <VStack>
-                <Text fontWeight="600" fontSize={32}>Statistics</Text>
-                <Text fontWeight="500" color="#555555">Aug 1 - Aug 18, 2022</Text>
+          <Box>
+            <HStack justifyContent="space-between" alignItems="center">
+              <VStack key="TitleVStack">
+                <Text fontWeight="600" fontSize="32" key="Title">Statistics</Text>
+                <Text fontWeight="500" color="#555555" key="Timespan">
+                  {moment().startOf("month").format("MMM D")} - {moment().format("MMM D, YYYY")}
+                </Text>
               </VStack>
-              <TouchableOpacity>
+              <TouchableOpacity key="CalendarTouchableOpacity">
                 <Center borderWidth={1.5} borderColor="#EFEEEE" w="12" h="12" rounded={15}>
                   <FontAwesomeIcon icon="fa-solid fa-calendar-days" color="#7C7B7A" size={18}/>
                 </Center>
               </TouchableOpacity>
             </HStack>
-            <Box px="3">
+            <Box>
               <Select 
                 mt="8"
                 fontSize="16"
@@ -148,18 +157,16 @@ export default function StatsScreen({navigation}) {
               </Select>
             </Box>
 
-            <Box w="100%" h="56" overflow="visible" style={{ marginHorizontal: -15}}>
+            <Box w="100%" h="56" overflow="visible" style={{ marginHorizontal: -27}}>
               <VictoryChart
-                colorScale="qualitative"
                 padding={{
                   top: 40,
                   left: 47,
                   bottom: 95,
                   right: 40
                 }}
-
               >
-                <VictoryAxis
+                <VictoryAxis key="IndependantAxis"
                   tickFormat={t => moment(t).format(
                     groupBy === "months"
                     ? "MMM"
@@ -171,7 +178,7 @@ export default function StatsScreen({navigation}) {
                     getCurrentExpenseData().map(obj => obj.x)
                   }
                 />
-                <VictoryAxis 
+                <VictoryAxis key="DependantAxis"
                   tickCount={4}
                   tickFormat={t => t < 0.05? "" : t}
                   dependentAxis
@@ -182,10 +189,9 @@ export default function StatsScreen({navigation}) {
                     },
                   }}
                 />
-                <VictoryGroup
-                  offset={15}
-                >
+                <VictoryGroup offset={15} key="Group">
                   <VictoryBar
+                    key='Budget'
                     data={getCurrentBudgetData()}
                     cornerRadius={{ topLeft: 6, topRight: 6}}
                     style={{
@@ -199,6 +205,7 @@ export default function StatsScreen({navigation}) {
                     }}
                   />
                   <VictoryBar
+                    key='Expense'
                     data={getCurrentExpenseData()}
                     cornerRadius={{ topLeft: 6, topRight: 6}}
                     style={{
@@ -215,15 +222,15 @@ export default function StatsScreen({navigation}) {
               </VictoryChart>
             </Box>
             
-            <Box px="3">
+            <Box>
               <TouchableOpacity onPress={() => navigation.navigate("Detailed Analytics")}>
-                <Center w="100%" h="12" bg="#6a48fa" mt="5" rounded={100}>
-                  <Text fontWeight="600" fontSize="15" color="white">DETAILED ANALYTICS</Text>
+                <Center w="100%" bg="#6a48fa" mt="5" rounded={100} style={{ height: 54 }}>
+                  <Text fontWeight="600" fontSize="16" color="white">DETAILED ANALYTICS</Text>
                 </Center>
               </TouchableOpacity>
             </Box>
-            <Box px="3" mt="6">
-              <Text fontWeight="600" fontSize="18">Expenses categories</Text>
+            <Box mt="6" mb="3">
+              <Text fontSize={21} fontWeight="500">Expenses categories</Text>
             </Box>
           </Box>
         )}

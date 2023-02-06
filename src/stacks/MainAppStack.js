@@ -6,14 +6,13 @@ import CreateCategoryScreen from "../screens/CreateCategoryScreen";
 import DetailedAnalyticsScreen from "../screens/DetailedAnalyticsScreen";
 import EditBudgetScreen from "../screens/EditBudgetScreen";
 import auth from '@react-native-firebase/auth';
-import { useCollection, useCollectionData } from 'react-firebase-hooks/firestore';
-import { db } from "../firebase";
 import { createContext, useEffect, useRef, useState } from "react";
 import { RECENT_TRANSACTIONS_TO_SHOW, SPLASH_SCREEN_DURATION } from "../data/Constants";
 import SeeTransactionsScreen from "../screens/SeeTransactionsScreen";
 import EditTransactionScreen from "../screens/EditTransactionScreen";
 import SplashScreen from "../screens/SplashScreen";
 import moment from "moment";
+import firestore from "@react-native-firebase/firestore";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,34 +26,59 @@ export const weekBeforeStartOfTheMonth = moment(startOfTheMonth).startOf("isoWee
 // Maybe use useCollection instead of useCollectionData so I can use startAt and startAfter?
 export default function MainAppStack() {
 
-  const [recentTransactions, setRecentTransactions] = useState(-1);
+  const [recentTransactions, setRecentTransactions] = useState();
+  const [transactionsThisMonthPlusWeek, setTransactionsThisMonthPlusWeek] = useState();
+  const [transactionsBeforeStartOfMonth, setTransactionsBeforeStartOfmonth] = useState();
+  const [dataCollection, setDataCollection] = useState();
 
-  transactionsRef = db
-    .collection('users')
-    .doc(auth().currentUser.uid)
-    .collection('transactions');
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("transactions")
+      .where("date", ">=", weekBeforeStartOfTheMonth.getTime())
+      .orderBy("date", "desc")
+      .onSnapshot(querySnapshot => {
+        setTransactionsThisMonthPlusWeek(querySnapshot.docs.map(documentSnapshot => documentSnapshot.data()));
+      });
 
-  const transactionsThisMonthQuery = transactionsRef.where("date", ">=", weekBeforeStartOfTheMonth.getTime()).orderBy('date', 'desc');
-  const [transactionsThisMonthPlusWeek] = useCollectionData(transactionsThisMonthQuery, {idField: 'id'});
+    return () => subscriber();
+  }, []);
 
-  const transactionsBeforeStartOfTheMonthPlusWeekQuery = 
-    transactionsRef
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("transactions")
       .where("date", "<", weekBeforeStartOfTheMonth.getTime())
-      .orderBy('date', "desc")
-      .limit(RECENT_TRANSACTIONS_TO_SHOW);
-    
-  const [transactionsBeforeStartOfTheMonthPlusWeek] = useCollectionData(transactionsBeforeStartOfTheMonthPlusWeekQuery, {idField: "id"});
+      .orderBy("date", "desc")
+      .limit(RECENT_TRANSACTIONS_TO_SHOW)
+      .onSnapshot(querySnapshot => {
+        setTransactionsBeforeStartOfmonth(querySnapshot.docs.map(documentSnapshot => documentSnapshot.data()));
+      });
 
-  const dataQuery = db.collection('users').doc(auth().currentUser.uid).collection('data');
-  const [dataCollection] = useCollection(dataQuery, {idField: 'id'});
+    return () => subscriber();
+  }, []);
+
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .onSnapshot(querySnapshot => {
+        setDataCollection(querySnapshot);
+      });
+
+    return () => subscriber();
+  }, []);
 
   useEffect(() => {
 
-    if (transactionsThisMonthPlusWeek == undefined || transactionsBeforeStartOfTheMonthPlusWeek == undefined)
+    if (transactionsThisMonthPlusWeek == undefined || transactionsBeforeStartOfMonth == undefined)
       return 
 
-    setRecentTransactions(transactionsThisMonthPlusWeek.concat(transactionsBeforeStartOfTheMonthPlusWeek));
-  }, [transactionsThisMonthPlusWeek, transactionsBeforeStartOfTheMonthPlusWeek])
+    setRecentTransactions(transactionsThisMonthPlusWeek.concat(transactionsBeforeStartOfMonth));
+  }, [transactionsThisMonthPlusWeek, transactionsBeforeStartOfMonth])
 
   return (
     <DataContext.Provider value={dataCollection}>

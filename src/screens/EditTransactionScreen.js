@@ -168,7 +168,8 @@ export default function EditTransactionScreen({navigation, route}) {
       return;
     }
 
-    setButtonEnabled(false);
+    route.params.onFinishEditing(transactionObj);
+    navigation.goBack();
 
     let writeDate = 
       date === initialDate.current
@@ -193,13 +194,7 @@ export default function EditTransactionScreen({navigation, route}) {
       .collection("transactions")
       .doc(transactionInfo.id)
       .update(transactionObj)
-      .then(() => {
-
-        setButtonEnabled(true);
-        route.params.onFinishEditing(transactionObj);
-        navigation.goBack();
-
-      })
+      .then()
       .catch(error => {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
@@ -241,6 +236,7 @@ export default function EditTransactionScreen({navigation, route}) {
       px="4"
     >
       <DateTimePickerModal
+        maximumDate={(new Date())}
         isVisible={datePickerVisible}
         mode="date"
         onConfirm={handleConfirmDatePicker}
@@ -267,7 +263,7 @@ export default function EditTransactionScreen({navigation, route}) {
               px="7"
               _focus={{
                 backgroundColor: "#f5f5f6",
-                borderColor: "rgba(0,0,0,0.05)",
+                borderColor: "rgba(0,0,0,0.01)",
                 borderWidth: 1
               }}
             />
@@ -286,7 +282,7 @@ export default function EditTransactionScreen({navigation, route}) {
               px="7"
               _focus={{
                 backgroundColor: "#f5f5f6",
-                borderColor: "rgba(0,0,0,0.05)",
+                borderColor: "rgba(0,0,0,0.01)",
                 borderWidth: 1
               }}
               onEndEditing={() => {
@@ -346,30 +342,39 @@ export default function EditTransactionScreen({navigation, route}) {
         height: 130
       }}>
         <VStack space={4} h="100%">
-          <HStack flex={1} space={3}>
-            <Button 
-              flex={1} 
-              rounded={100}  
-              bg={date === "today"? "#d9d9d9" : "#FAF9FA"}
-              _pressed={{
-                backgroundColor: "#b3b3b3"
-              }}
-              onPress={handleTodayButtonPress}
+        <HStack flex={1} space={3}>
+            <Box 
+              flex={1}   
             >
-                <Text ml="1" mt="-0.5" textAlign="center">Today</Text>
-            </Button>
+              <TouchableOpacity
+                onPress={handleTodayButtonPress}
+              >
+                <Center
+                  w="100%"
+                  h="100%"
+                  bg={date === "today"? "#d9d9d9" : "#FAF9FA"}
+                  rounded={100}
+                >
+                  <Text ml="1" mt="-0.5" textAlign="center">Today</Text>
+                </Center>
+              </TouchableOpacity>
+            </Box>
 
-            <Button 
+            <Box 
               flex={1} 
-              rounded={100} 
-              bg={date === "yesterday"? "#d9d9d9" : "#FAF9FA"}
-              _pressed={{
-                backgroundColor: "#b3b3b3"
-              }}
-              onPress={handleYesterdayButtonPress}
             >
-              <Text ml="1" mt="-0.5" textAlign="center">Yesterday</Text>
-            </Button>
+              <TouchableOpacity onPress={handleYesterdayButtonPress}>
+                <Center
+                  w="100%"
+                  h="100%"
+                  bg={date === "yesterday"? "#d9d9d9" : "#FAF9FA"}
+                  rounded={100}
+                >
+                  <Text ml="1" mt="-0.5" textAlign="center">Yesterday</Text>
+                </Center>
+              </TouchableOpacity>
+            </Box>
+
             <TouchableOpacity onPress={handleDateButtonPress} style={{
               aspectRatio: 1
             }}>  
@@ -385,10 +390,15 @@ export default function EditTransactionScreen({navigation, route}) {
             </TouchableOpacity>
           </HStack>
 
-          <Box style={{ height: 55 }}>
-            <Button disabled={!buttonEnabled} w="100%" h="100%" rounded={100} bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} _pressed={{ backgroundColor: 'black' }} onPress={handleEditTransaction}>
-              <Text color="white" fontWeight="500" fontSize={16}>EDIT TRANSACTION</Text>
-            </Button>
+          <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
+            <TouchableOpacity
+              disabled={!buttonEnabled}
+              onPress={handleEditTransaction}
+            >
+              <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
+                <Text color="white" fontWeight="600" fontSize={16}>EDIT TRANSACTION</Text>
+              </Center>
+            </TouchableOpacity>
           </Box>
 
         </VStack>

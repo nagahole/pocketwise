@@ -25,18 +25,22 @@ export default function IconGrid({
           <HStack justifyContent="space-between" key={i}>
             {
               row.map((icon, j) => (
-                <TouchableOpacity onPress={() => setSelectedIcon(icon)}>
+                <TouchableOpacity onPress={() => setSelectedIcon(icon)} disabled={icon == null} key={`${i} ${j}`}>
                   <Center 
-                    key={j} 
-                    bg={icon == null? "transparent" : transparentize(color, 0.85)} 
+                    bg={
+                      icon == null
+                      ? "transparent" 
+                      : selectedIcon === icon
+                      ? color 
+                      : transparentize(color, 0.85)
+                    } 
                     rounded={size * 0.3} 
-                    borderWidth={selectedIcon === icon? 2 : 0}
                     style={{
                       height: size,
                       width: size
                     }}
                   >
-                    { icon && <FontAwesomeIcon icon={icon} size={iconSize} color={color}/> }
+                    { icon && <FontAwesomeIcon icon={icon} size={iconSize} color={selectedIcon === icon? "white" : color}/> }
                   </Center>
                 </TouchableOpacity>
               ))

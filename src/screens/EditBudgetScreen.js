@@ -37,7 +37,7 @@ export default function EditBudgetScreen({navigation, route}) {
   }
 
   function handleRemoveBudget() {
-    setButtonEnabled(false);
+    navigation.goBack();
 
     firestore()
       .collection("users")
@@ -47,10 +47,7 @@ export default function EditBudgetScreen({navigation, route}) {
       .update({
         [category.id]: firestore.FieldValue.delete()
       })
-      .then(() => {
-        navigation.goBack();
-        setButtonEnabled(true);
-      })
+      .then()
       .catch(error => {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);

@@ -10,7 +10,7 @@ export default function MyTabBar({ state, descriptors, navigation }) {
   return (
     <HStack
       alignItems="center"
-      justifyContent='space-around'
+      justifyContent="space-around"
       style={{ 
         height: insets.bottom + 65,
         paddingBottom: insets.bottom + 8,

@@ -1,12 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import Slider from "@react-native-community/slider";
 import { darken, transparentize } from "color2k";
 import { Box, Circle, HStack, Text, VStack } from "native-base";
-import { useContext } from "react";
 import { Dimensions } from "react-native";
-import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import useCategory from "../hooks/useCategory";
-import { DataContext } from "../stacks/MainAppStack";
 
 export default function BudgetItemWidget({id, outlay, totalAmount, first, last}) {
 

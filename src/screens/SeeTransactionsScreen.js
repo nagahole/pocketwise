@@ -11,6 +11,7 @@ import { RecentTransactionsContext } from "../stacks/MainAppStack";
 import moment from "moment";
 import { FlashList } from "@shopify/flash-list";
 import useCategory from "../hooks/useCategory";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SeeTransactionsScreen({navigation, route}) {
 
@@ -25,6 +26,8 @@ export default function SeeTransactionsScreen({navigation, route}) {
   const [groupedData, setGroupedData] = useState([]);
 
   const category = useCategory(route.params.category);
+
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     retrieveData();
@@ -124,7 +127,7 @@ export default function SeeTransactionsScreen({navigation, route}) {
       w="100%"
       h="100%"
       bg="white"
-      safeArea
+      safeAreaTop
     >
       <Box px="4">
         <BackButton/>
@@ -160,7 +163,7 @@ export default function SeeTransactionsScreen({navigation, route}) {
           </Box>
         )}
         keyExtractor={item => item[0]}
-        contentContainerStyle={{ paddingHorizontal: 25 }}
+        contentContainerStyle={{ paddingHorizontal: 25, paddingBottom: insets.bottom }}
         ListFooterComponent={(!bottomReached || loading) && <ActivityIndicator style={{ marginTop: 20 }}/>}
         onEndReached={retrieveMore}
         onEndReachedThreshold={2}

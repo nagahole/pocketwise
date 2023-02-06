@@ -23,7 +23,7 @@ export default function CreateCategoryScreen({navigation, route}) {
   const [name, setName] = useState(isEditMode? category.name : "");
   const [outlay, setOutlay] = useState(isEditMode? (outlays[category.id]?.toString()?? "" ): "");
   const [selectedIcon, setSelectedIcon] = useState(isEditMode? category.icon : null);
-  const [selectedColor, setSelectedColor] = useState(isEditMode? category.color : "gray");
+  const [selectedColor, setSelectedColor] = useState(isEditMode? category.color : "#808080");
 
   const [buttonEnabled, setButtonEnabled] = useState(true);
 
@@ -38,12 +38,12 @@ export default function CreateCategoryScreen({navigation, route}) {
       return;
     }
 
-    if (selectedColor === "gray") {
+    if (selectedColor === "#808080") {
       Alert.alert("Please select a color");
       return;
     }
 
-    setButtonEnabled(false);
+    navigation.goBack();
 
     let id = uuidv4();
 
@@ -61,12 +61,7 @@ export default function CreateCategoryScreen({navigation, route}) {
           id
         }
       }, {merge: true})
-      .then(() => {
-
-        setButtonEnabled(true);
-        navigation.goBack();
-
-      })
+      .then()
       .catch(error => {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
@@ -163,12 +158,7 @@ export default function CreateCategoryScreen({navigation, route}) {
       .set({
         [id]: firestore.FieldValue.delete()
       }, {merge: true})
-      .then(() => {
-
-        setButtonEnabled(true);
-        navigation.goBack();
-
-      })
+      .then()
       .catch(error => {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
@@ -191,7 +181,7 @@ export default function CreateCategoryScreen({navigation, route}) {
       return;
     }
 
-    setButtonEnabled(false);
+    navigation.goBack();
 
     firestore()
       .collection("users")
@@ -207,12 +197,7 @@ export default function CreateCategoryScreen({navigation, route}) {
           id: category.id
         }
       }, {merge: true})
-      .then(() => {
-
-        setButtonEnabled(true);
-        navigation.goBack();
-
-      })
+      .then()
       .catch(error => {
         setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
@@ -243,12 +228,11 @@ export default function CreateCategoryScreen({navigation, route}) {
       <Box flex={1}>
         <Box>
           <BackButton/>
-          <Text fontWeight="600" fontSize={28} mb="3">{isEditMode? "Edit category" : "Create category"}</Text>
+          <Text fontWeight="600" fontSize="32" mt="1" mb="3">{isEditMode? "Edit category" : "Create category"}</Text>
           <Input
             placeholder="Name"
             value={name}
             onChangeText={setName}
-            keyboardType="decimal-pad"
             rounded={20}
             variant="filled"
             style={{
@@ -260,7 +244,7 @@ export default function CreateCategoryScreen({navigation, route}) {
             px="7"
             _focus={{
               backgroundColor: "#f5f5f6",
-              borderColor: "rgba(0,0,0,0.05)",
+              borderColor: "rgba(0,0,0,0.01)",
               borderWidth: 1
             }}
           />
@@ -281,7 +265,7 @@ export default function CreateCategoryScreen({navigation, route}) {
             px="7"
             _focus={{
               backgroundColor: "#f5f5f6",
-              borderColor: "rgba(0,0,0,0.05)",
+              borderColor: "rgba(0,0,0,0.01)",
               borderWidth: 1
             }}
             onEndEditing={() => {
@@ -304,7 +288,7 @@ export default function CreateCategoryScreen({navigation, route}) {
               icons={ICONS} 
               itemsPerRow={5} 
               size={50} 
-              iconSize={18} 
+              iconSize={24} 
               color={selectedColor}
               selectedIcon={selectedIcon}
               setSelectedIcon={setSelectedIcon}
@@ -317,14 +301,15 @@ export default function CreateCategoryScreen({navigation, route}) {
       }}>
         <VStack space={4} h="100%">
           <VStack space={6} flex={1}>
-            <Text fontWeight="600" fontSize="18">Choose color</Text>
+            <Text fontWeight="600" fontSize="18" mt="2">Choose color</Text>
             <HStack justifyContent="space-around" px="1">
               {
                 Object.values(COLORS).map(hex => (
                   <TouchableOpacity 
                     onPress={() => setSelectedColor(hex)}
+                    key={hex}
                   >
-                    <Box bg={hex} h="6" w="6" rounded={6} borderWidth={selectedColor === hex? 1 : 0}/>
+                    <Box bg={hex} h="6" w="6" rounded={6}/>
                   </TouchableOpacity>
                 ))
               }
@@ -351,18 +336,20 @@ export default function CreateCategoryScreen({navigation, route}) {
             )
           }
 
-          <Box style={{ height: 55 }}>
-            <Button 
+          <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
+            <TouchableOpacity
               disabled={!buttonEnabled} 
-              w="100%" 
-              h="100%" 
-              rounded={100} 
-              bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)} 
-              _pressed={{ backgroundColor: 'black' }} 
               onPress={isEditMode? handleEditCategory : handleAddCategory}
             >
-              <Text color="white" fontWeight="500" fontSize={16}>{isEditMode? "SAVE CHANGES" : "ADD CATEGORY"}</Text>
-            </Button>
+              <Center 
+                w="100%" 
+                h="100%" 
+                rounded={100} 
+                bg="#6a48fa"
+              >
+                <Text color="white" fontWeight="600" fontSize={16}>{isEditMode? "SAVE CHANGES" : "ADD CATEGORY"}</Text>
+              </Center>
+            </TouchableOpacity>
           </Box>
           
         </VStack>

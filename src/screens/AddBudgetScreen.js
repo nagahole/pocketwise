@@ -34,13 +34,10 @@ export default function AddBudgetScreen({navigation}) {
       return;
     }
 
-    setButtonEnabled(false);
+    navigation.goBack();
 
     onOutlayIncrease(selectedCategory.id, parseFloat(amount))
-      .then(() => {
-        setButtonEnabled(true);
-        navigation.goBack();
-      })
+      .then()
       .catch(error => { 
 
         if (error == 'No document exist!') {
@@ -50,11 +47,7 @@ export default function AddBudgetScreen({navigation}) {
             .set({
               [selectedCategory.id]: parseFloat(amount)
             })
-            .then(() => { 
-              console.log("Successfuly wrote data");
-              setButtonEnabled(true);
-              navigation.goBack();
-            })
+            .then()
             .catch(e => Alert.alert(e.nativeErrorCode, e.nativeErrorMessage?? e.message));
 
           return;
@@ -164,16 +157,19 @@ export default function AddBudgetScreen({navigation}) {
         </VStack>
       </ScrollView>
       <Box style={{ height: 55 }} px="4">
-        <Button 
-          disabled={!buttonEnabled} 
-          w="100%" h="100%" 
-          rounded={100} 
-          bg={buttonEnabled? "#333333" : transparentize("#333333", 0.5)}
-          _pressed={{ backgroundColor: 'black' }} 
-          onPress={handleAddBudget}
+        <TouchableOpacity
+          disabled={!buttonEnabled}
+          onPress={handleAddBudget} 
         >
-          <Text color="white" fontWeight="500" fontSize={16}>ADD BUDGET</Text>
-        </Button>
+          <Center 
+            w="100%" 
+            h="100%" 
+            rounded={100} 
+            bg="#6a48fa"
+          >
+            <Text color="white" fontWeight="500" fontSize={16}>ADD BUDGET</Text>
+          </Center>
+        </TouchableOpacity>
       </Box>
     </Box>
   )

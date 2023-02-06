@@ -51,8 +51,8 @@ export default function BudgetScreen({navigation}) {
       h="100%"
       bg="white"
       style={{
-        paddingTop: insets.top + 10,
-        paddingHorizontal: 20
+        paddingTop: insets.top + 27,
+        paddingHorizontal: 27
       }}
     >
       <Text fontWeight="600" fontSize="32">Monthly budget</Text>
@@ -65,13 +65,14 @@ export default function BudgetScreen({navigation}) {
           data={expenseOutlaysArr}
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.id}
+          //Have to do this to make shadow overflow
           style={{
             marginHorizontal: -20
           }}
           contentContainerStyle={{
             paddingTop: 20,
-            paddingBottom: 34,
-            paddingHorizontal: 20
+            paddingBottom: 40,
+            paddingHorizontal: 14
           }}
           renderItem={({item}) => (
             <BudgetVerticalListItem 
@@ -83,8 +84,8 @@ export default function BudgetScreen({navigation}) {
       </Box>
 
       <TouchableOpacity onPress={() => navigation.navigate("Add Budget")}>
-        <Center w="100%" bg="#6a48fa" h="12" rounded={100} position="absolute" bottom="6">
-          <Text color="white">ADD NEW BUDGET</Text>
+        <Center w="100%" bg="#6a48fa" rounded={100} position="absolute" bottom="6" style={{ height: 54 }}>
+          <Text fontWeight="600" fontSize="16" color="white">ADD NEW BUDGET</Text>
         </Center>
       </TouchableOpacity>
       

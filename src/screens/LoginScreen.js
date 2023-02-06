@@ -70,7 +70,7 @@ export default function LoginScreen({navigation}) {
             px="7"
             _focus={{
               backgroundColor: "#f5f5f6",
-              borderColor: "rgba(0,0,0,0.05)",
+              borderColor: "rgba(0,0,0,0.01)",
               borderWidth: 1
             }}
             placeholder="Email"
@@ -90,7 +90,7 @@ export default function LoginScreen({navigation}) {
             px="7"
             _focus={{
               backgroundColor: "#f5f5f6",
-              borderColor: "rgba(0,0,0,0.05)",
+              borderColor: "rgba(0,0,0,0.01)",
               borderWidth: 1
             }}
             placeholder="Password"

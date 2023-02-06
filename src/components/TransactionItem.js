@@ -154,6 +154,8 @@ export default function TransactionItem({
                         }
                       });
                     }
+
+                    onItemDelete()
                     
                     firestore()
                       .collection("users")
@@ -161,7 +163,7 @@ export default function TransactionItem({
                       .collection("transactions")
                       .doc(id)
                       .delete()
-                      .then(() => onItemDelete())
+                      .then()
                       .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
                   }
                 }

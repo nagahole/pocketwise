@@ -2,11 +2,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { useNavigation } from "@react-navigation/native";
 import { transparentize } from "color2k";
 import { Box, Text, AspectRatio, Center, HStack, VStack } from "native-base";
-import { useContext } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import useCategory from "../hooks/useCategory";
-import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
 
 export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAmount}) {
 
@@ -19,7 +16,7 @@ export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAm
   }
 
   return (
-    <Box w="100%" bg="white" mb="4" rounded={24} style={{
+    <Box w="100%" bg="white" mb="4" rounded={20} style={{
       shadowRadius: 25,
       shadowOpacity: 0.05,
       shadowOffset: { width: -10, height: 10 },
@@ -29,7 +26,7 @@ export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAm
         <AspectRatio ratio={1} h="100%">
           <Center
             bg={transparentize(category.color, 0.85)}
-            rounded={15}
+            rounded={12}
           >
             <FontAwesomeIcon icon={category.icon} size={iconSize} color={category.color}/>
           </Center>
@@ -47,7 +44,7 @@ export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAm
           </HStack>
 
           { /* PROGRESS BAR */}
-          <Box w="100%" bg={transparentize("#6a49fb", 0.75)} style={{ height: 3 }} overflow="hidden" rounded={100}>
+          <Box w="100%" mt="1.5" bg={transparentize("#6a49fb", 0.75)} style={{ height: 3 }} overflow="hidden" rounded={100}>
             <Box w={`${totalAmount / outlay * 100}%`} h="100%" bg="#6a49fb" rounded={100}/>
           </Box>
         </VStack>

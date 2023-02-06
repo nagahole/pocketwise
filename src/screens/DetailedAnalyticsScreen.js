@@ -161,15 +161,20 @@ export default function DetailedAnalyticsScreen({navigation}) {
     >
       <FlatList
         data={recentTransactions.slice(0, Math.min(RECENT_TRANSACTIONS_TO_SHOW, recentTransactions.length))}
-        renderItem={({item}) => <TransactionItem {...item}/>}
+        renderItem={({item}) => (
+          <Box style={{ paddingHorizontal: 5 }}>
+            <TransactionItem {...item}/>
+          </Box>
+        )}
         contentContainerStyle={{
+          paddingTop: 12,
           paddingHorizontal: 20,
           paddingBottom: insets.bottom
         }}
         ListHeaderComponent={() => (
           <Box>
             <BackButton/>
-            <Text fontWeight="600" fontSize={32}>Detailed analytics</Text>
+            <Text fontWeight="600" fontSize="32">Detailed analytics</Text>
             <Select 
               mt="3"
               fontSize="16"
@@ -184,26 +189,6 @@ export default function DetailedAnalyticsScreen({navigation}) {
               <Select.Item label="By months" value="months" onPress={() => setGroupBy("months")}/>
             </Select>
             <Box mt="4">
-              {/* <SwitchSelector
-                options={SWITCH_OPTIONS}
-                initial={0}
-                onPress={value => console.log(`Call onPress with value: ${value}`)}
-                buttonColor="white"
-                backgroundColor="#F2F1F8"
-                selectedColor="#6C4AFA"
-                hasPadding
-                valuePadding={2}
-                borderColor="#F2F1F8"
-                textColor="#242D4C"
-                height={45}
-                fontSize={16}
-                textStyle={{
-                  fontWeight: '500'
-                }}
-                selectedTextStyle={{
-                  fontWeight: '500'
-                }}
-              /> */}
             </Box>
             <Box mt="4" rounded={20} borderWidth={1.5} borderColor="#EFEDEF" p="3">
               <Box h="64">
@@ -214,7 +199,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                     labels={() => null}
                     padding={{
                       right: 40,
-                      left: 10,
+                      left: 11,
                       top: 0,
                       bottom: 148
                     }}
@@ -229,7 +214,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                     textAnchor="middle" 
                     text={`$${Math.round(getTotalAmount())}`}
                     x={(Dimensions.get('window').width - 40)* 0.49}
-                    y={200}
+                    y={197}
                     style={{
                       fontSize: 60
                     }}
@@ -238,7 +223,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                     textAnchor="middle" 
                     text="Total spending"
                     x={(Dimensions.get('window').width - 40) * 0.49}
-                    y={150}
+                    y={147}
                     style={{
                       fontSize: 25,
                       fontWeight: '600'
@@ -248,7 +233,7 @@ export default function DetailedAnalyticsScreen({navigation}) {
                     textAnchor="middle" 
                     text={getTimeText()}
                     x={(Dimensions.get('window').width - 40) * 0.49}
-                    y={250}
+                    y={247}
                     style={{
                       fontSize: 25
                     }}

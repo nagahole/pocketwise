@@ -1,6 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEye, faEyeSlash, faHeart } from '@fortawesome/free-regular-svg-icons';
-import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBellConcierge, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faHandshake, faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBellConcierge, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGamepad, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faTicket, faTrash, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 library.add( 
   faBagShopping, faEllipsis, faBars, faPlus, faChevronRight, faDollarSign, faCalendarDays,
@@ -9,7 +9,7 @@ library.add(
   faEyeSlash, faArrowTrendUp, faArrowRightArrowLeft, faMoneyBillTrendUp, faMoneyBillTransfer,
   faHandHoldingDollar, faLandmark, faMoneyBills, faMoneyCheckDollar, faCommentsDollar,
   faHospital, faHouse, faUser, faEnvelope, faClipboard, faBarcode, faChevronDown, faTrash,
-  faBellConcierge
+  faBellConcierge, faTicket, faHandshake, faGamepad, faUsers
 );
 
 const ICONS = [
@@ -19,11 +19,15 @@ const ICONS = [
   "fa-solid fa-envelope",
   "fa-solid fa-clipboard",
   "fa-solid fa-barcode",
+  "fa-solid fa-burger",
+  "fa-solid fa-ticket",
+  "fa-regular fa-handshake",
+  "fa-soid fa-users",
 
   //#region default icons
   "fa-solid fa-bowl-food",
   "fa-solid fa-taxi",
-  "fa-solid fa-burger",
+  "fa-solid fa-bell-concierge",
   "fa-solid fa-shirt",
   "fa-solid fa-dumbbell",
   "fa-regular fa-heart",
@@ -41,6 +45,7 @@ const ICONS = [
   "fa-solid fa-money-bills",
   "fa-solid fa-hospital",
   "fa-solid fa-dollar",
+  "fa-solid fa-gamepad",
   //#endregion
 ]
 

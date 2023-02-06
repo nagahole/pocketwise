@@ -13,9 +13,9 @@ export default function SplashScreen({navigation}) {
   const navigatedOut = useRef(false);
 
   useEffect(() => {
-    if (data != undefined && recentTransactions != -1 && !navigatedOut.current) {
-      navigation.navigate("Main Tab");
+    if (data != undefined && recentTransactions != undefined && !navigatedOut.current) {
       navigatedOut.current = true;
+      setTimeout(() => navigation.navigate("Main Tab"), 200);
     }
   }, [data, recentTransactions])
   

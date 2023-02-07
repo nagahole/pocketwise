@@ -12,13 +12,13 @@ export default function BudgetItemWidget({id, outlay, totalAmount, first, last})
     <Box
       bg="white"
       borderRadius="30"
-      ml={first? "-1.5" : "2"}
+      ml={first? "0" : "2"}
       mr={last? "0" : "2"}
       style={{
         shadowRadius: 25,
         shadowOpacity: 0.05,
         shadowOffset: { width: -10, height: 10 },
-        width: Dimensions.get('window').width - 30 * 2 + 11,
+        width: Dimensions.get('window').width - 27 * 2,
         height: 200
       }}
     >
@@ -50,7 +50,7 @@ export default function BudgetItemWidget({id, outlay, totalAmount, first, last})
         py="7"
       >
         <Box w="100%" h="1.5" bg={transparentize(category.color, 0.85)} rounded={100} overflow="hidden">
-          <Box w={`${totalAmount / outlay * 100}%`} h="100%" bg={category.color} rounded={100}/>
+          <Box w={`${Math.min(totalAmount / outlay * 100, 100)}%`} h="100%" bg={category.color} rounded={100}/>
         </Box>
         <Text textAlign="center" fontSize="14" mt="5">
           Spent 

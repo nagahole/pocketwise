@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { Box, Button, Center, HStack, Input, ScrollView, Text, VStack } from "native-base";
+import { Box, Button, Center, HStack, Input, KeyboardAvoidingView, ScrollView, Text, VStack } from "native-base";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import SwitchSelector from "react-native-switch-selector";
 import BackButton from "../components/BackButton";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Alert, Dimensions } from "react-native";
+import { Alert, Dimensions, LayoutAnimation } from "react-native";
 import { useContext, useRef, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SimpleGrid } from "react-native-super-grid";
@@ -188,6 +188,13 @@ export default function EditTransactionScreen({navigation, route}) {
       date: writeDate
     }
 
+    LayoutAnimation.configureNext({
+      duration: 500,
+      update: {
+        type: "easeInEaseOut"
+      }
+    });
+
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
@@ -243,7 +250,9 @@ export default function EditTransactionScreen({navigation, route}) {
         onCancel={hideDatePicker}
       />
       <BackButton navigation={navigation}/>
+
       <Box flex={1}>
+      <ScrollView bounces={false} contentContainerStyle={{ flex: 1}}>
         <Box>
           <VStack space={3}>
             <Text fontWeight="600" fontSize={28}>Edit transaction</Text>
@@ -269,7 +278,7 @@ export default function EditTransactionScreen({navigation, route}) {
             />
             <Input
               value={amount}
-              onChangeText={text => setAmount(text.replace(/[^0-9\.]/g, ''))}
+              onChangeText={text => setAmount(text.replace(',','.').replace(/[^0-9\.]/g, ''))}
               keyboardType="decimal-pad"
               rounded={20}
               variant="filled"
@@ -288,7 +297,7 @@ export default function EditTransactionScreen({navigation, route}) {
               onEndEditing={() => {
                 setAmount(prev => {
                   let float = parseFloat(prev);
-                  return isNaN(float)? "0" : float.toString();
+                  return isNaN(float)? "" : float.toString();
                 });
               }}
               InputRightElement={(
@@ -327,7 +336,7 @@ export default function EditTransactionScreen({navigation, route}) {
                 <ExpenseCategoryGridItem 
                   {...item} 
                   onPress={item.onPress?? (() => setCategoryID(item.value))} 
-                  iconSize={20} 
+                  iconSize={25} 
                   marginBottom={15}
                   selected={categoryID === item.value}
                   color={item.addNew? "" : item.color}
@@ -336,6 +345,7 @@ export default function EditTransactionScreen({navigation, route}) {
             />
           </ScrollView>
         </Box>
+      </ScrollView>
       </Box>
       
       <Box py="2.5" style={{

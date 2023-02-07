@@ -1,25 +1,36 @@
-import { Box, Button, Input, Link, Pressable, Text, VStack } from "native-base";
+import { Box, Button, Center, Input, Link, Pressable, ScrollView, Text, VStack } from "native-base";
 import { useEffect, useState } from "react";
 import auth from '@react-native-firebase/auth';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Alert } from "react-native";
+import { Alert, Dimensions } from "react-native";
 
 export default function SignupScreen({navigation}) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [show, setShow] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const [buttonEnabled, setButtonEnabled] = useState(true);
+
   const insets = useSafeAreaInsets();
 
   function handleSignup() {
+    if (password !== confirmPassword) {
+      Alert.alert("", "Passwords are not matching");
+      return;
+    }
+
+    setButtonEnabled(false);
+
     auth()
       .createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
+        setButtonEnabled(true);
         auth().currentUser
           .sendEmailVerification()
           .then(() => {
@@ -27,7 +38,10 @@ export default function SignupScreen({navigation}) {
           })
           .catch(error => { Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message)});
       })
-      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+      .catch(error => {
+        setButtonEnabled(true);
+        Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message)
+      });
   }
 
   return (
@@ -39,8 +53,11 @@ export default function SignupScreen({navigation}) {
         paddingBottom: insets.bottom
       }}
     >
+    <ScrollView bounces={false} contentContainerStyle={{ flex: 1}}>
       <VStack justifyContent="space-between" w="100%" h="100%" px="4">
-        <VStack alignItems="center" justifyContent="center" flex={1} space={5} pb="24">
+        <VStack alignItems="center" justifyContent="center" flex={1} space={5} style={{
+          paddingBottom: Dimensions.get('window').height * 0.12
+        }}>
           <Text fontWeight="600" fontSize={30} mb="8">SIGN UP</Text>
           <Input
             value={email}
@@ -96,6 +113,8 @@ export default function SignupScreen({navigation}) {
             )}
           />
           <Input
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
             rounded={20}
             variant="filled"
             type={showConfirm? "text" : "password"}
@@ -125,12 +144,18 @@ export default function SignupScreen({navigation}) {
             )}
           />
         </VStack>
-        <Box style={{ height: 55 }}>
-          <Button w="100%" h="100%" rounded={100} bg="#333333" _pressed={{ backgroundColor: 'black' }} onPress={handleSignup}>
-            <Text color="white" fontWeight="500" fontSize={16}>SIGN UP</Text>
-          </Button>
+        <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
+          <TouchableOpacity
+            onPress={handleSignup}
+            disabled={!buttonEnabled}
+          >
+            <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
+              <Text color="white" fontWeight="600" fontSize={16}>SIGN UP</Text>
+            </Center>
+          </TouchableOpacity>
         </Box>
       </VStack>
+    </ScrollView>
     </Box>
   )
 }

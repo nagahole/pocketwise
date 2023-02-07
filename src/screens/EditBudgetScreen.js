@@ -1,11 +1,11 @@
-import { Box, Button, Center, Input, ScrollView, Text, VStack } from "native-base";
-import { useEffect, useState } from "react";
+import { Box, Center, Input, ScrollView, Text } from "native-base";
+import { useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import BackButton from "../components/BackButton";
 import useCategory from "../hooks/useCategory";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Alert } from "react-native";
+import { Alert, LayoutAnimation } from "react-native";
 import { MINIMUM_OUTLAY } from "../data/Constants";
 
 export default function EditBudgetScreen({navigation, route}) {
@@ -18,6 +18,14 @@ export default function EditBudgetScreen({navigation, route}) {
   const [amount, setAmount] = useState(route.params.outlay.toString());
 
   function onEndEditing() {
+
+    LayoutAnimation.configureNext({
+      duration: 350,
+      update: {
+        type: "easeInEaseOut"
+      }
+    });
+
     setAmount(prev => {
       let float = Math.max(parseFloat(prev), MINIMUM_OUTLAY);
       let str = isNaN(float)? `${MINIMUM_OUTLAY}` : float.toString();
@@ -38,6 +46,17 @@ export default function EditBudgetScreen({navigation, route}) {
 
   function handleRemoveBudget() {
     navigation.goBack();
+
+    LayoutAnimation.configureNext({
+      duration: 350,
+      delete: {
+        property: "scaleXY",
+        type: "easeInEaseOut"
+      },
+      update: {
+        type: "easeInEaseOut"
+      }
+    });
 
     firestore()
       .collection("users")
@@ -69,7 +88,7 @@ export default function EditBudgetScreen({navigation, route}) {
         <Text fontWeight="700" fontSize="40" mt="-2" style={{ marginLeft: -1.25}}>{category.name.capitalize()}</Text>
         <Input
           value={amount}
-          onChangeText={text => setAmount(text.replace(/[^0-9\.]/g, ''))}
+          onChangeText={text => setAmount(text.replace(',','.').replace(/[^0-9\.]/g, ''))}
           keyboardType="decimal-pad"
           placeholder="$0"
           rounded={20}

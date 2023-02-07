@@ -11,6 +11,7 @@ import { transparentize } from "color2k";
 import { v4 as uuidv4 } from 'uuid';
 import useCategory from "../hooks/useCategory";
 import { DataContext } from "../stacks/MainAppStack";
+import { DismissKeyboardView } from "../components/DismissKeyboardView";
 
 export default function CreateCategoryScreen({navigation, route}) {
 
@@ -150,6 +151,9 @@ export default function CreateCategoryScreen({navigation, route}) {
   }
 
   function removeCategoryField(id) {
+    navigation.goBack();
+    setButtonEnabled(true);
+
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
@@ -226,6 +230,7 @@ export default function CreateCategoryScreen({navigation, route}) {
       px="4"
     >
       <Box flex={1}>
+      <ScrollView bounces={false} contentContainerStyle={{ flex: 1}}>
         <Box>
           <BackButton/>
           <Text fontWeight="600" fontSize="32" mt="1" mb="3">{isEditMode? "Edit category" : "Create category"}</Text>
@@ -251,7 +256,7 @@ export default function CreateCategoryScreen({navigation, route}) {
           <Input
             placeholder="Planned outlay"
             value={outlay}
-            onChangeText={text => setOutlay(text.replace(/[^0-9\.]/g, ''))}
+            onChangeText={text => setOutlay(text.replace(',','.').replace(/[^0-9\.]/g, ''))}
             keyboardType="decimal-pad"
             mt="3"
             rounded={20}
@@ -271,7 +276,7 @@ export default function CreateCategoryScreen({navigation, route}) {
             onEndEditing={() => {
               setOutlay(prev => {
                 let float = parseFloat(prev);
-                return isNaN(float)? "0" : float.toString();
+                return isNaN(float)? "" : float.toString();
               });
             }}
             InputRightElement={(
@@ -288,14 +293,16 @@ export default function CreateCategoryScreen({navigation, route}) {
               icons={ICONS} 
               itemsPerRow={5} 
               size={50} 
-              iconSize={24} 
+              iconSize={22} 
               color={selectedColor}
               selectedIcon={selectedIcon}
               setSelectedIcon={setSelectedIcon}
             />
           </ScrollView>
         </Box>
+      </ScrollView>
       </Box>
+
       <Box pb="2.5" style={{
         height: isEditMode? 175 + 60 : 175
       }}>

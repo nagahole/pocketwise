@@ -5,7 +5,7 @@ import { TouchableOpacity } from "react-native";
 import useCategory from "../hooks/useCategory";
 
 export default function ExpenseCategoryListItem({
-  categoryID, amount, iconSize=22, numberOfTransactions, percentageOfTotal, onPress
+  categoryID, amount, iconSize=24, numberOfTransactions, percentageOfTotal, onPress
 }) {
 
   const category = useCategory(categoryID);

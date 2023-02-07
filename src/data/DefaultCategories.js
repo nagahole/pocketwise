@@ -25,11 +25,11 @@ const DEFAULT_CATEGORIES = {
     name: "Eating out", 
     type: "expenses"
   }, 
-  expense_food: {
-    color: "#fd895a", 
-    icon: "fa-solid fa-bowl-food", 
-    id: "expense_food", 
-    name: "Food", 
+  expense_groceries: {
+    color: COLORS.orange, 
+    icon: "fa-solid fa-basket-shopping", 
+    id: "expense_groceries", 
+    name: "Groceries", 
     type: "expenses"
   }, 
   expense_gifts: {

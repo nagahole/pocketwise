@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { Box, Button, Center, HStack, Input, ScrollView, Select, Text, VStack } from "native-base";
 import { useState } from "react";
-import { Alert, TouchableOpacity } from "react-native";
+import { Alert, LayoutAnimation, TouchableOpacity } from "react-native";
 import BackButton from "../components/BackButton";
 import BudgetForModal from "../components/BudgetForModal";
 import { transparentize } from "color2k";
@@ -9,13 +9,6 @@ import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
 export default function AddBudgetScreen({navigation}) {
-
-  const documentReference = 
-    firestore()
-      .collection("users")
-      .doc(auth().currentUser.uid)
-      .collection("data")
-      .doc("outlays");
 
   const [budgetModalVisible, setBudgetModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(-1);
@@ -36,43 +29,26 @@ export default function AddBudgetScreen({navigation}) {
 
     navigation.goBack();
 
-    onOutlayIncrease(selectedCategory.id, parseFloat(amount))
-      .then()
-      .catch(error => { 
-
-        if (error == 'No document exist!') {
-          console.log("No document exists. Creating document instead");
-
-          documentReference
-            .set({
-              [selectedCategory.id]: parseFloat(amount)
-            })
-            .then()
-            .catch(e => Alert.alert(e.nativeErrorCode, e.nativeErrorMessage?? e.message));
-
-          return;
-        }
-
-        Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message)
-      });
-  }
-
-  function onOutlayIncrease(id, increase) {
-
-    return firestore().runTransaction(async transaction => {
-      // Get post data first
-      const documentSnapshot = await transaction.get(documentReference);
-  
-      if (!documentSnapshot.exists) {
-        throw 'No document exist!';
+    LayoutAnimation.configureNext({
+      duration: 350,
+      create: {
+        property: "scaleXY",
+        type: "easeInEaseOut"
+      },
+      update: {
+        type: "easeInEaseOut"
       }
-
-      let prev = documentSnapshot.data()[id] ?? 0;
-  
-      transaction.update(documentReference, {
-        [id] : prev + increase
-      });
     });
+
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("outlays")
+      .set({
+        [selectedCategory.id]: parseFloat(amount)
+      }, { merge: true })
+      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message))
   }
 
   return (
@@ -133,7 +109,7 @@ export default function AddBudgetScreen({navigation}) {
             <Text fontWeight="600" fontSize="16" my="2">Amount</Text>
             <Input
               value={amount}
-              onChangeText={text => setAmount(text.replace(/[^0-9\.]/g, ''))}
+              onChangeText={text => setAmount(text.replace(',','.').replace(/[^0-9\.]/g, ''))}
               keyboardType="decimal-pad"
               placeholder="$0"
               rounded={20}
@@ -149,7 +125,7 @@ export default function AddBudgetScreen({navigation}) {
               onEndEditing={() => {
                 setAmount(prev => {
                   let float = parseFloat(prev);
-                  return isNaN(float)? "0" : float.toString();
+                  return isNaN(float)? "" : float.toString();
                 });
               }}
             />

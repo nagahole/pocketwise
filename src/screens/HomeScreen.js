@@ -122,57 +122,55 @@ export default function HomeScreen({navigation}) {
               <Box 
                 position="absolute" 
                 style={{
-                  marginHorizontal: -30,
+                  marginHorizontal: -27,
                   width: Dimensions.get('window').width,
                   height: Dimensions.get('window').height
                 }}
               >
-
-              { /* Decorative Parallax Objects */}
-              {
-                SHOW_PARALLAX_OBJECTS && (
-                  <>
-                    <Animated.View
-                      style={{
-                        position: 'absolute',
-                        top: -100,
-                        width: '35%',
-                        height: '30%',
-                        backgroundColor: '#bfbfff66',
-                        transform: [{translateY: Animated.multiply(nScroll, 0.8)}],
-                        borderBottomRightRadius: 40
-                      }}
-                    />
-                    <Animated.View
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: 100,
-                        width: '40%',
-                        height: '40%',
-                        backgroundColor: '#bfd5ff66',
-                        transform: [{translateY: Animated.multiply(nScroll, 0.7)}],
-                        borderTopLeftRadius: 35,
-                        borderBottomLeftRadius: 35
-                      }}
-                    />
-                    <Animated.View
-                      style={{
-                        borderRadius: 70,
-                        position: 'absolute',
-                        left: -Dimensions.get('window').width * 0.15,
-                        top: 450,
-                        width: '70%',
-                        height: '25%',
-                        backgroundColor: '#e0bfff66',
-                        transform: [{translateY: Animated.multiply(nScroll, 0.65)}]
-                      }}
-                    />
-                  </>
-                )
-              }
-
+                {
+                  SHOW_PARALLAX_OBJECTS && (
+                    <>
+                      <Animated.View
+                        style={{
+                          position: 'absolute',
+                          top: -100,
+                          width: '35%',
+                          height: '30%',
+                          backgroundColor: '#bfbfff66',
+                          transform: [{translateY: Animated.multiply(nScroll, 0.8)}],
+                          borderBottomRightRadius: 40
+                        }}
+                      />
+                      <Animated.View
+                        style={{
+                          position: 'absolute',
+                          right: 0,
+                          top: 100,
+                          width: '40%',
+                          height: '40%',
+                          backgroundColor: '#bfd5ff66',
+                          transform: [{translateY: Animated.multiply(nScroll, 0.7)}],
+                          borderTopLeftRadius: 35,
+                          borderBottomLeftRadius: 35
+                        }}
+                      />
+                      <Animated.View
+                        style={{
+                          borderRadius: 70,
+                          position: 'absolute',
+                          left: -Dimensions.get('window').width * 0.15,
+                          top: 450,
+                          width: '70%',
+                          height: '25%',
+                          backgroundColor: '#e0bfff66',
+                          transform: [{translateY: Animated.multiply(nScroll, 0.65)}]
+                        }}
+                      />
+                    </>
+                  )
+                }
               </Box>
+              
               <Box mt="2">
                 <Text fontSize={24} mt="4" mb="5" fontWeight="500">Budget details</Text>
                 <Box>

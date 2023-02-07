@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { darken, lighten, transparentize } from "color2k";
 import { AspectRatio, Box, Center, Text, VStack } from "native-base";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native";
 
 export default function ExpenseCategoryGridItem({
   size = 60, label, iconName, addNew, iconSize=20, onPress, 

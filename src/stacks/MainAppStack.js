@@ -13,6 +13,9 @@ import EditTransactionScreen from "../screens/EditTransactionScreen";
 import SplashScreen from "../screens/SplashScreen";
 import moment from "moment";
 import firestore from "@react-native-firebase/firestore";
+import AccountScreen from "../screens/settings_screens/AccountScreen";
+import ChangePasswordScreen from "../screens/settings_screens/ChangePasswordScreen";
+import ChangeEmailScreen from "../screens/settings_screens/ChangeEmailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -93,6 +96,9 @@ export default function MainAppStack() {
         <Stack.Screen name="See Transactions" component={SeeTransactionsScreen}/>
         <Stack.Screen name="Edit Budget" component={EditBudgetScreen}/>
         <Stack.Screen name="Edit Transaction" component={EditTransactionScreen}/>
+        <Stack.Screen name="Account Screen" component={AccountScreen}/>
+        <Stack.Screen name="Change Password" component={ChangePasswordScreen}/>
+        <Stack.Screen name="Change Email" component={ChangeEmailScreen}/>
       </Stack.Navigator>
     </RecentTransactionsContext.Provider>
     </DataContext.Provider>

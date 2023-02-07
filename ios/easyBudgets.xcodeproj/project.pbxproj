@@ -24,7 +24,7 @@
 		0F32CC222987CD7600DCA50D /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F32CC122987CD7600DCA50D /* EvilIcons.ttf */; };
 		0F32CC232987CD7600DCA50D /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F32CC132987CD7600DCA50D /* SimpleLineIcons.ttf */; };
 		0F32CC242987CD7600DCA50D /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F32CC142987CD7600DCA50D /* MaterialIcons.ttf */; };
-		0F32CC262989F8B400DCA50D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0F32CC252989F8B400DCA50D /* GoogleService-Info.plist */; };
+		0F32CC282992238E00DCA50D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0F32CC272992238E00DCA50D /* GoogleService-Info.plist */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -63,7 +63,8 @@
 		0F32CC122987CD7600DCA50D /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
 		0F32CC132987CD7600DCA50D /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
 		0F32CC142987CD7600DCA50D /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
-		0F32CC252989F8B400DCA50D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0F32CC272992238E00DCA50D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0F32CC2929922BBA00DCA50D /* easyBudgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = easyBudgets.entitlements; path = easyBudgets/easyBudgets.entitlements; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* easyBudgets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = easyBudgets.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = easyBudgets/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = easyBudgets/AppDelegate.mm; sourceTree = "<group>"; };
@@ -143,6 +144,7 @@
 		13B07FAE1A68108700A75B9A /* easyBudgets */ = {
 			isa = PBXGroup;
 			children = (
+				0F32CC2929922BBA00DCA50D /* easyBudgets.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -173,7 +175,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				0F32CC252989F8B400DCA50D /* GoogleService-Info.plist */,
+				0F32CC272992238E00DCA50D /* GoogleService-Info.plist */,
 				0F32CC042987CD7600DCA50D /* Fonts */,
 				13B07FAE1A68108700A75B9A /* easyBudgets */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -313,7 +315,7 @@
 				0F32CC212987CD7600DCA50D /* Zocial.ttf in Resources */,
 				0F32CC232987CD7600DCA50D /* SimpleLineIcons.ttf in Resources */,
 				0F32CC172987CD7600DCA50D /* Feather.ttf in Resources */,
-				0F32CC262989F8B400DCA50D /* GoogleService-Info.plist in Resources */,
+				0F32CC282992238E00DCA50D /* GoogleService-Info.plist in Resources */,
 				0F32CC162987CD7600DCA50D /* Octicons.ttf in Resources */,
 				0F32CC192987CD7600DCA50D /* FontAwesome5_Brands.ttf in Resources */,
 				0F32CC1B2987CD7600DCA50D /* AntDesign.ttf in Resources */,
@@ -577,6 +579,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = easyBudgets/easyBudgets.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 36LN6NH5Z7;
 				ENABLE_BITCODE = NO;
@@ -591,7 +594,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.naga.easyTodos;
+				PRODUCT_BUNDLE_IDENTIFIER = com.naga.easyBudgets;
 				PRODUCT_NAME = easyBudgets;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -605,6 +608,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = easyBudgets/easyBudgets.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 36LN6NH5Z7;
 				INFOPLIST_FILE = easyBudgets/Info.plist;
@@ -618,7 +622,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.naga.easyTodos;
+				PRODUCT_BUNDLE_IDENTIFIER = com.naga.easyBudgets;
 				PRODUCT_NAME = easyBudgets;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

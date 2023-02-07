@@ -58,7 +58,7 @@ export default function BudgetScreen({navigation}) {
       <Text fontWeight="600" fontSize="32">Monthly budget</Text>
       <HStack alignItems="flex-end" mt="3" space={3}>
         <Text fontWeight="bold" fontSize="44" lineHeight="44">${Math.round(expenseOutlaysArr.reduce((acc, o) => acc + o.outlay, 0))}</Text>
-        <Text fontWeight="600" fontSize="16" mb="1">in {expenseOutlaysArr.length} categories</Text>
+        <Text fontWeight="600" fontSize="16" mb="1">in {expenseOutlaysArr.length} {expenseOutlaysArr.length === 1? "category" : "categories"}</Text>
       </HStack>
       <Box pt="1" pb="9" flex={1} mx="-0.5">
         <FlatList

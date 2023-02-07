@@ -1,7 +1,6 @@
 import { Box, Center, Input, ScrollView, Text } from "native-base";
 import { useState } from "react";
-import { Alert, Dimensions } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Alert, Dimensions, TouchableOpacity } from "react-native";
 import BackButton from "../components/BackButton";
 import auth from "@react-native-firebase/auth";
 

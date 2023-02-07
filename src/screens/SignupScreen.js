@@ -2,9 +2,8 @@ import { Box, Button, Center, Input, Link, Pressable, ScrollView, Text, VStack }
 import { useEffect, useState } from "react";
 import auth from '@react-native-firebase/auth';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Alert, Dimensions } from "react-native";
+import { Alert, Dimensions, TouchableOpacity } from "react-native";
 
 export default function SignupScreen({navigation}) {
 

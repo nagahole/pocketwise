@@ -5,7 +5,7 @@ import SwitchSelector from "react-native-switch-selector";
 import BackButton from "../components/BackButton";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Alert, Dimensions } from "react-native";
+import { Alert, Dimensions, Keyboard, LayoutAnimation } from "react-native";
 import { useContext, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SimpleGrid } from "react-native-super-grid";
@@ -13,6 +13,7 @@ import ExpenseCategoryGridItem from "../components/ExpenseCategoryGridItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import { DataContext } from "../stacks/MainAppStack";
 import { v4 as uuidv4 } from 'uuid';
+import { DismissKeyboardView } from "../components/DismissKeyboardView";
 
 export const SWITCH_OPTIONS = [
   { label: "Expenses", value: "expenses" },
@@ -157,6 +158,14 @@ export default function AddTransactionScreen({navigation}) {
     navigation.goBack();
     let id = uuidv4();
 
+    // LayoutAnimation.configureNext({
+    //   duration: 350,
+    //   create: {
+    //     property: "scaleXY",
+    //     type: "easeInEaseOut"
+    //   }
+    // });
+
     firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
@@ -233,6 +242,7 @@ export default function AddTransactionScreen({navigation}) {
       />
       <BackButton navigation={navigation}/>
       <Box flex={1}>
+      <ScrollView bounces={false} contentContainerStyle={{ flex: 1 }}>
         <Box>
           <VStack space={3}>
             <Text fontWeight="600" fontSize="32" mt="2">Add transaction</Text>
@@ -258,7 +268,7 @@ export default function AddTransactionScreen({navigation}) {
             />
             <Input
               value={amount}
-              onChangeText={text => setAmount(text.replace(/[^0-9\.]/g, ''))}
+              onChangeText={text => setAmount(text.replace(',','.').replace(/[^0-9\.]/g, ''))}
               keyboardType="decimal-pad"
               rounded={20}
               variant="filled"
@@ -277,7 +287,7 @@ export default function AddTransactionScreen({navigation}) {
               onEndEditing={() => {
                 setAmount(prev => {
                   let float = parseFloat(prev);
-                  return isNaN(float)? "0" : float.toString();
+                  return isNaN(float)? "" : float.toString();
                 });
               }}
               InputRightElement={(
@@ -325,6 +335,7 @@ export default function AddTransactionScreen({navigation}) {
             />
           </ScrollView>
         </Box>
+      </ScrollView>
       </Box>
       
       <Box py="2.5" style={{

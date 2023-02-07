@@ -1,6 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faEyeSlash, faHandshake, faHeart } from '@fortawesome/free-regular-svg-icons';
-import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBellConcierge, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGamepad, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faTicket, faTrash, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBasketShopping, faBellConcierge, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGamepad, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faTicket, faTrash, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 library.add( 
   faBagShopping, faEllipsis, faBars, faPlus, faChevronRight, faDollarSign, faCalendarDays,
@@ -9,7 +9,7 @@ library.add(
   faEyeSlash, faArrowTrendUp, faArrowRightArrowLeft, faMoneyBillTrendUp, faMoneyBillTransfer,
   faHandHoldingDollar, faLandmark, faMoneyBills, faMoneyCheckDollar, faCommentsDollar,
   faHospital, faHouse, faUser, faEnvelope, faClipboard, faBarcode, faChevronDown, faTrash,
-  faBellConcierge, faTicket, faHandshake, faGamepad, faUsers
+  faBellConcierge, faTicket, faHandshake, faGamepad, faUsers, faBasketShopping
 );
 
 const ICONS = [
@@ -23,9 +23,11 @@ const ICONS = [
   "fa-solid fa-ticket",
   "fa-regular fa-handshake",
   "fa-soid fa-users",
+  "fa-solid fa-bowl-food",
+  "fa-solid fa-bag-shopping",
 
   //#region default icons
-  "fa-solid fa-bowl-food",
+  "fa-solid fa-basket-shopping",
   "fa-solid fa-taxi",
   "fa-solid fa-bell-concierge",
   "fa-solid fa-shirt",

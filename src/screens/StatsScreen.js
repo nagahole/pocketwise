@@ -30,7 +30,9 @@ export default function StatsScreen({navigation}) {
   const [weeklyBudgetData, setWeeklyBudgetData] = useState([]);
   const [dailyBudgetData, setDailyBudgetData] = useState([]);
 
-  const outlays = useContext(DataContext).docs.find(x => x.id === "outlays")?.data() ?? {};
+  const dataContext = useContext(DataContext);
+
+  const outlays = dataContext.docs.find(x => x.id === "outlays")?.data() ?? {}
 
   const budgetThisMonth = Object.values(outlays).reduce((acc, amount) => acc + amount, 0);
 
@@ -55,6 +57,7 @@ export default function StatsScreen({navigation}) {
   }, []);
 
   useEffect(() => {
+
     let thisMonthsExpenses = recentTransactions.filter(x => x.date > startOfTheMonth.getTime() && x.type === "expenses");
 
     setExpenseGroupsArr(getExpenseGroupsArr(groupTransactionsByCategory(thisMonthsExpenses))[0]);
@@ -76,7 +79,7 @@ export default function StatsScreen({navigation}) {
     setWeeklyBudgetData(_weeklyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth / ( daysThisMonth / 7 ) })));
     setDailyBudgetData(_dailyExpenses.map(obj => ({ x: obj.x, y: budgetThisMonth / daysThisMonth })));
 
-  }, [allMonthsExpenses])
+  }, [allMonthsExpenses, dataContext])
 
   function getCurrentExpenseData() {
     if (groupBy === "months") return monthlyExpenses

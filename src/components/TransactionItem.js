@@ -8,9 +8,10 @@ import { Alert, Animated, LayoutAnimation, StyleSheet } from "react-native";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
+import { TRANSACTION_ITEM_SWIPEABLE_WIDTH } from "../data/Constants";
 
 export default function TransactionItem({ 
-  id, reference, categoryID, amount, type, iconSize=22, swipeable = true, date,
+  id, reference, categoryID, amount, type, iconSize=24, swipeable = true, date,
   onItemDelete = () => {}, onItemEdit = () => {}, configLayoutOnDelete = true
 }) {
 
@@ -102,14 +103,14 @@ export default function TransactionItem({
 
   function renderRightActions(progress) {
     return (
-      <Box style={{ width: 192, paddingBottom: 12, paddingLeft: 8 }}>
+      <Box style={{ width: TRANSACTION_ITEM_SWIPEABLE_WIDTH, paddingBottom: 12, paddingLeft: 8 }}>
         <Box 
           flexDir="row" 
           flex={1}
           overflow="hidden"
           rounded={20}
         >
-          {renderRightAction('fa-solid fa-pencil', 'black', 192, progress, () => {
+          {renderRightAction('fa-solid fa-pencil', 'black', TRANSACTION_ITEM_SWIPEABLE_WIDTH, progress, () => {
             navigation.navigate(
               "Edit Transaction", 
               {
@@ -128,7 +129,7 @@ export default function TransactionItem({
               }
             );
           })}
-          {renderRightAction('fa-solid fa-trash', 'black', 96, progress, () => {
+          {renderRightAction('fa-solid fa-trash', 'black', TRANSACTION_ITEM_SWIPEABLE_WIDTH / 2, progress, () => {
             Alert.alert(
               "Delete this transaction?",
               "This cannot be undone. Continue?",
@@ -144,13 +145,13 @@ export default function TransactionItem({
 
                     if (configLayoutOnDelete) {
                       LayoutAnimation.configureNext({
-                        duration: 300,
+                        duration: 350,
                         update: {
                           type: "easeInEaseOut"
                         },
                         delete: {
-                          type: "linear",
-                          property: "opacity"
+                          type: "easeInEaseOut",
+                          property: "scaleXY"
                         }
                       });
                     }
@@ -188,7 +189,7 @@ export default function TransactionItem({
       <Swipeable 
         ref={updateRef}
         friction={2}
-        leftThreshold={30}
+        rightThreshold={30}
         renderRightActions={renderRightActions}
         containerStyle={{ overflow: "visible" }}
       >

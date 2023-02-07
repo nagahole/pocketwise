@@ -1,10 +1,10 @@
-import { Box, Button, Input, Link, Pressable, Text, VStack } from "native-base";
+import { Box, Button, Center, Input, Link, Pressable, ScrollView, Text, VStack } from "native-base";
 import { useEffect, useState } from "react";
 import auth from '@react-native-firebase/auth';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Alert } from "react-native";
+import { Alert, Dimensions } from "react-native";
 
 export default function LoginScreen({navigation}) {
   const [initializing, setInitializing] = useState(true);
@@ -13,6 +13,8 @@ export default function LoginScreen({navigation}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [buttonEnabled, setButtonEnabled] = useState(true);
+
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function LoginScreen({navigation}) {
       if (initializing) setInitializing(false);
 
       if (user) {
-        navigation.navigate("Main Stack")
+        navigation.replace("Main Stack")
       }
     });
 
@@ -29,13 +31,17 @@ export default function LoginScreen({navigation}) {
   }, []);
 
   function handleLogin() {
+    setButtonEnabled(false);
+
     auth()
       .signInWithEmailAndPassword(email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-        console.log("Logged in with", user.email);        
+        console.log("Logged in with", user.email); 
+        setButtonEnabled(true);       
       })
       .catch(error => { 
+        setButtonEnabled(true);
         Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message);
       });
   }
@@ -51,8 +57,11 @@ export default function LoginScreen({navigation}) {
         paddingBottom: insets.bottom
       }}
     >
+    <ScrollView bounces={false} contentContainerStyle={{ flex: 1}}>
       <VStack justifyContent="space-between" w="100%" h="100%" px="4">
-        <VStack alignItems="center" justifyContent="center" flex={1} space={5} pb="20">
+        <VStack alignItems="center" justifyContent="center" flex={1} space={5} style={{
+          paddingBottom: Dimensions.get('window').height * 0.1
+        }}>
           <Text fontWeight="600" fontSize={30} mb="8">LOG IN</Text>
           <Input
             value={email}
@@ -106,14 +115,20 @@ export default function LoginScreen({navigation}) {
               </Pressable>
             )}
           />
-          <Link mt="4">Forgot password?</Link>
+          <Link mt="4" onPress={() => navigation.navigate("Forgot Password")}>Forgot password?</Link>
         </VStack>
-        <Box style={{ height: 55 }}>
-          <Button w="100%" h="100%" rounded={100} bg="#333333" _pressed={{ backgroundColor: 'black' }} onPress={handleLogin}>
-            <Text color="white" fontWeight="500" fontSize={16}>LOG IN</Text>
-          </Button>
+        <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
+          <TouchableOpacity
+            onPress={handleLogin}
+            disabled={!buttonEnabled}
+          >
+            <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
+              <Text color="white" fontWeight="600" fontSize={16}>LOG IN</Text>
+            </Center>
+          </TouchableOpacity>
         </Box>
       </VStack>
+    </ScrollView>
     </Box>
   )
 }

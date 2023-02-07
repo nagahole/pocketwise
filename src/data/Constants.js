@@ -4,3 +4,4 @@ export const SHOW_PARALLAX_OBJECTS = false;
 export const MINIMUM_OUTLAY = 5;
 export const UNITS_TO_GRAPH = 6;
 export const SPLASH_SCREEN_DURATION = 600;
+export const TRANSACTION_ITEM_SWIPEABLE_WIDTH = 180;

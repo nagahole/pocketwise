@@ -4,9 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BudgetItemWidget from '../components/BudgetItemWidget';
 import SwitchSelector from "react-native-switch-selector";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import TransactionItem from '../components/TransactionItem';
-import { Animated, Dimensions } from 'react-native';
+import { Animated, Dimensions, TouchableOpacity } from 'react-native';
 import { DataContext, RecentTransactionsContext, startOfTheMonth } from '../stacks/MainAppStack';
 import { RECENT_TRANSACTIONS_TO_SHOW, SHOW_PARALLAX_OBJECTS } from '../data/Constants';
 import DEFAULT_CATEGORIES from '../data/DefaultCategories';

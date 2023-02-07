@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Box, Center, Circle, HStack, Text } from 'native-base';
-import { Dimensions, TouchableOpacity } from 'react-native';
+import { Dimensions, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -100,7 +100,7 @@ export default function MyTabBar({ state, descriptors, navigation }) {
         }
 
         return (
-          <TouchableOpacity
+          <TouchableWithoutFeedback
             key={label}
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
@@ -108,10 +108,13 @@ export default function MyTabBar({ state, descriptors, navigation }) {
             testID={options.tabBarTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
           >
-            <Ionicons name={iconName} size={32} color={isFocused? "#6A48FA" : "#7775A6"} />
-          </TouchableOpacity>
+            <Center
+              flex={1}
+            >
+              <Ionicons name={iconName} size={32} color={isFocused? "#6A48FA" : "#7775A6"} />
+            </Center>
+          </TouchableWithoutFeedback>
         );
       })}
     </HStack>

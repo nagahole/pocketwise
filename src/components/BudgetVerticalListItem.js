@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { useNavigation } from "@react-navigation/native";
 import { transparentize } from "color2k";
 import { Box, Text, AspectRatio, Center, HStack, VStack } from "native-base";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native";
 import useCategory from "../hooks/useCategory";
 
 export default function BudgetVerticalListItem({id, outlay, iconSize=25, totalAmount}) {

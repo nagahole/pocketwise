@@ -1,6 +1,6 @@
 import { Box, Button, Center, HStack, Input, ScrollView, Text, VStack } from "native-base";
 import BackButton from "../components/BackButton";
-import { Alert, TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import IconGrid from "../components/IconGrid";
 import COLORS from "../data/Colors";
 import ICONS from "../data/Icons";
@@ -85,7 +85,7 @@ export default function CreateCategoryScreen({navigation, route}) {
   function handleRemoveCategory() {
     Alert.alert(
       "Warning",
-      "Deleting this category will remove any and all transactions of category. Continue?",
+      "Deleting this category will remove any and all transactions of this category. Continue?",
       [
         {
           text: "Cancel",
@@ -306,18 +306,18 @@ export default function CreateCategoryScreen({navigation, route}) {
       <Box pb="2.5" style={{
         height: isEditMode? 175 + 60 : 175
       }}>
-        <VStack space={4} h="100%">
+        <VStack space={2.5} h="100%">
           <VStack space={6} flex={1}>
             <Text fontWeight="600" fontSize="18" mt="2">Choose color</Text>
             <HStack justifyContent="space-around" px="1">
               {
                 Object.values(COLORS).map(hex => (
-                  <TouchableOpacity 
+                  <TouchableWithoutFeedback 
                     onPress={() => setSelectedColor(hex)}
                     key={hex}
                   >
                     <Box bg={hex} h="6" w="6" rounded={6}/>
-                  </TouchableOpacity>
+                  </TouchableWithoutFeedback>
                 ))
               }
             </HStack>
@@ -335,8 +335,9 @@ export default function CreateCategoryScreen({navigation, route}) {
                     rounded={100} 
                     bg="white"
                     borderWidth={2}
+                    borderColor="#6a48fa"
                   >
-                    <Text fontWeight="500" fontSize={16}>REMOVE CATEGORY</Text>
+                    <Text fontWeight="500" fontSize={16} color="#6a48fa">REMOVE CATEGORY</Text>
                   </Center>
                 </TouchableOpacity>
               </Box>

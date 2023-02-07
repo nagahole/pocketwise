@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>741258166528-2ska0ljlvet73vp0cp6tvtkok66fummr.apps.googleusercontent.com</string>
+	<string>741258166528-32le6qrq300618hopbof769m10t3btk0.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.741258166528-2ska0ljlvet73vp0cp6tvtkok66fummr</string>
+	<string>com.googleusercontent.apps.741258166528-32le6qrq300618hopbof769m10t3btk0</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBJa-Dr2LtmcDwSQ6ACMmo4XY1hqOsqVns</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.naga.easyTodos</string>
+	<string>com.naga.easyBudgets</string>
 	<key>PROJECT_ID</key>
 	<string>easy-budgets-2b8c6</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:741258166528:ios:d8c5973e2d001902e473e5</string>
+	<string>1:741258166528:ios:358ad97b24387c62e473e5</string>
 </dict>
 </plist>

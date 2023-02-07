@@ -3,6 +3,8 @@ import { Box, Center, HStack, ScrollView, Text } from "native-base";
 import { Alert, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import auth from '@react-native-firebase/auth';
+import SettingsButton from "../components/SettingsButton";
+import SettingsBoxContainer from "../components/SettingsBoxContainer";
 
 export default function SettingsScreen({navigation}) {
 
@@ -44,38 +46,12 @@ export default function SettingsScreen({navigation}) {
     >
       <ScrollView style={{ paddingHorizontal: 27, paddingTop: 27 }}>
         <Text fontWeight="600" fontSize="32">Settings</Text>
-        <Box width="100%" rounded={20} px="5" py="2" bg="white" mt="8" 
-          style={{
-            shadowColor: 'black',
-            shadowRadius: 15,
-            shadowOpacity: 0.1
-          }}
-        >
-          <TouchableOpacity>
-            <HStack h="12" my="1" justifyContent="space-between" alignItems="center">
-              <Text fontSize={17} fontWeight="600">Account</Text>
-              <FontAwesomeIcon icon="fa-solid fa-chevron-right"/>
-            </HStack>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <HStack h="12" my="1" justifyContent="space-between" alignItems="center">
-              <Text fontSize={17} fontWeight="600">Notifications</Text>
-              <FontAwesomeIcon icon="fa-solid fa-chevron-right"/>
-            </HStack>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <HStack h="12" my="1" justifyContent="space-between" alignItems="center">
-              <Text fontSize={17} fontWeight="600">Terms and policies</Text>
-              <FontAwesomeIcon icon="fa-solid fa-chevron-right"/>
-            </HStack>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <HStack h="12" my="1" justifyContent="space-between" alignItems="center">
-              <Text fontSize={17} fontWeight="600">Contact support</Text>
-              <FontAwesomeIcon icon="fa-solid fa-chevron-right"/>
-            </HStack>
-          </TouchableOpacity>
-        </Box>
+        <SettingsBoxContainer mt="8">
+          <SettingsButton text="Account" onPress={() => navigation.navigate("Account Screen")}/>
+          {/* <SettingsButton text="Notifications"/>
+          <SettingsButton text="Terms and policies"/>
+          <SettingsButton text="Contact support"/> */}
+        </SettingsBoxContainer>
         
         <Center w="100%" h="12" mt="10">
           <TouchableOpacity onPress={handleLogOut}>

@@ -1,12 +1,10 @@
-import { Box, Center, Input, ScrollView, Text } from "native-base";
+import { Box, Center, Input, ScrollView, Text, VStack } from "native-base";
 import { useState } from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import BackButton from "../components/BackButton";
 import useCategory from "../hooks/useCategory";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Alert, LayoutAnimation } from "react-native";
-import { MINIMUM_OUTLAY } from "../data/Constants";
+import { Alert, LayoutAnimation, TouchableOpacity } from "react-native";
 
 export default function EditBudgetScreen({navigation, route}) {
 
@@ -17,8 +15,7 @@ export default function EditBudgetScreen({navigation, route}) {
 
   const [amount, setAmount] = useState(route.params.outlay.toString());
 
-  function onEndEditing() {
-
+  function handleSaveChanges() {
     LayoutAnimation.configureNext({
       duration: 350,
       update: {
@@ -26,22 +23,17 @@ export default function EditBudgetScreen({navigation, route}) {
       }
     });
 
-    setAmount(prev => {
-      let float = Math.max(parseFloat(prev), MINIMUM_OUTLAY);
-      let str = isNaN(float)? `${MINIMUM_OUTLAY}` : float.toString();
+    navigation.goBack();
 
-      firestore()
-        .collection("users")
-        .doc(auth().currentUser.uid)
-        .collection("data")
-        .doc("outlays")
-        .update({
-          [category.id]: parseFloat(str)
-        })
-        .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
-
-      return str;
-    });
+    firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("data")
+      .doc("outlays")
+      .update({
+        [category.id]: parseFloat(amount)
+      })
+      .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
   }
 
   function handleRemoveBudget() {
@@ -102,28 +94,51 @@ export default function EditBudgetScreen({navigation, route}) {
           }}
           fontSize={16}
           px="6"
-          onEndEditing={onEndEditing}
+          onEndEditing={() => {
+            setAmount(prev => {
+              let float = parseFloat(prev);
+              let str = isNaN(float)? "" : float.toString();
+        
+              return str;
+            });
+          }}
         />
       </ScrollView>
 
-
-      <Box style={{ height: 55 }} opacity={buttonEnabled? 1 : 0.3}>
-        <TouchableOpacity 
-          disabled={!buttonEnabled}
-          onPress={handleRemoveBudget}
-        >
-          <Center 
-            w="100%" 
-            h="100%" 
-            rounded={100} 
-            borderColor={"#333333"} 
-            borderWidth={1.5}
-            bg="transparent" 
+      <VStack space={3.5}>
+        <Box style={{ height: 55 }} opacity={buttonEnabled? 1 : 0.3}>
+          <TouchableOpacity 
+            disabled={!buttonEnabled}
+            onPress={handleRemoveBudget}
           >
-            <Text fontWeight="500" fontSize={16}>REMOVE BUDGET</Text>
-          </Center>
-        </TouchableOpacity>
-      </Box>
+            <Center 
+              w="100%" 
+              h="100%" 
+              rounded={100} 
+              borderColor="#6a48fa"
+              borderWidth={2}
+              bg="transparent" 
+            >
+              <Text fontWeight="500" fontSize={16} color="#6a48fa">REMOVE BUDGET</Text>
+            </Center>
+          </TouchableOpacity>
+        </Box>
+        <Box style={{ height: 55 }} opacity={buttonEnabled? 1 : 0.3}>
+          <TouchableOpacity 
+            disabled={!buttonEnabled}
+            onPress={handleSaveChanges}
+          >
+            <Center 
+              w="100%" 
+              h="100%" 
+              rounded={100} 
+              bg="#6a48fa"
+            >
+              <Text fontWeight="500" fontSize={16} color="white">SAVE CHANGES</Text>
+            </Center>
+          </TouchableOpacity>
+        </Box>
+      </VStack>
     </Box>
   )
 }

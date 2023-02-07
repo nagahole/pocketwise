@@ -1,11 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { Box, Button, Center, HStack, Input, ScrollView, Text, VStack } from "native-base";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import SwitchSelector from "react-native-switch-selector";
 import BackButton from "../components/BackButton";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Alert, Dimensions, Keyboard, LayoutAnimation } from "react-native";
+import { Alert, Dimensions, Keyboard, LayoutAnimation, TouchableOpacity } from "react-native";
 import { useContext, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SimpleGrid } from "react-native-super-grid";
@@ -13,7 +11,6 @@ import ExpenseCategoryGridItem from "../components/ExpenseCategoryGridItem";
 import DEFAULT_CATEGORIES from "../data/DefaultCategories";
 import { DataContext } from "../stacks/MainAppStack";
 import { v4 as uuidv4 } from 'uuid';
-import { DismissKeyboardView } from "../components/DismissKeyboardView";
 
 export const SWITCH_OPTIONS = [
   { label: "Expenses", value: "expenses" },

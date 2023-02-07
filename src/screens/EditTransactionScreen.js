@@ -1,11 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { Box, Button, Center, HStack, Input, KeyboardAvoidingView, ScrollView, Text, VStack } from "native-base";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import SwitchSelector from "react-native-switch-selector";
 import BackButton from "../components/BackButton";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Alert, Dimensions, LayoutAnimation } from "react-native";
+import { Alert, Dimensions, LayoutAnimation, TouchableOpacity } from "react-native";
 import { useContext, useRef, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SimpleGrid } from "react-native-super-grid";

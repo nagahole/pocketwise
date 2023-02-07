@@ -1,4 +1,5 @@
 import moment from "moment";
+import auth from "@react-native-firebase/auth"
 
 String.prototype.capitalize = function() {
   if (this.length === 0) return this;
@@ -102,3 +103,25 @@ export function getExpenseGroupsArr(groupedTransactions) {
 export function getDays(year, month) {
   return new Date(year, month, 0).getDate();
 };
+
+export function reauthenticate(currentPassword) {
+  var user = auth().currentUser;
+  var cred = auth.EmailAuthProvider.credential(user.email, currentPassword);
+  return user.reauthenticateWithCredential(cred);
+}
+
+export function isSignedInWithPassword() {
+  let providerData = auth().currentUser?.providerData
+
+  if (providerData == undefined || providerData == null) {
+    console.warn("Current user is null or undefined");
+  }
+
+  for (let data of providerData) {
+    if (data.providerId === "password") {
+      return true;
+    }
+  }
+
+  return false;
+}

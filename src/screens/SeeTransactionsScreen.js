@@ -174,11 +174,13 @@ export default function SeeTransactionsScreen({navigation, route}) {
               <Text fontWeight="600" fontSize={32}>{route.params.category === "all"? "Transactions" : category.name.capitalize()}</Text>
               {
                 route.params.dateRange === "all" && (
-                  <TouchableOpacity>
-                    <Center borderWidth={1.5} borderColor="#EFEEEE" w="12" h="12" rounded={15}>
-                      <FontAwesomeIcon icon="fa-solid fa-calendar-days" color="#7C7B7A" size={18}/>
-                    </Center>
-                  </TouchableOpacity>
+                  <>
+                    {/* <TouchableOpacity>
+                      <Center borderWidth={1.5} borderColor="#EFEEEE" w="12" h="12" rounded={15}>
+                        <FontAwesomeIcon icon="fa-solid fa-calendar-days" color="#7C7B7A" size={18}/>
+                      </Center>
+                    </TouchableOpacity> */}
+                  </>
                 )
               }
             </HStack>

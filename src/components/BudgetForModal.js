@@ -84,7 +84,8 @@ export default function BudgetForModal({visible, closeModal, modalHeight = 400, 
           position: 'absolute',
           bottom: 0,
           backgroundColor: 'white',
-          borderRadius: 20,
+          borderTopRightRadius: 20,
+          borderTopLeftRadius: 20,
           height: modalHeight
         }, modalStyle]}
       >

@@ -7,11 +7,10 @@ import ICONS from "../data/Icons";
 import { useContext, useState } from "react";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { transparentize } from "color2k";
 import { v4 as uuidv4 } from 'uuid';
 import useCategory from "../hooks/useCategory";
 import { DataContext } from "../stacks/MainAppStack";
-import { DismissKeyboardView } from "../components/DismissKeyboardView";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export default function CreateCategoryScreen({navigation, route}) {
 
@@ -27,6 +26,8 @@ export default function CreateCategoryScreen({navigation, route}) {
   const [selectedColor, setSelectedColor] = useState(isEditMode? category.color : "#808080");
 
   const [buttonEnabled, setButtonEnabled] = useState(true);
+
+  const netInfo = useNetInfo();
 
   function handleAddCategory() {
     if (name === "") {
@@ -83,6 +84,12 @@ export default function CreateCategoryScreen({navigation, route}) {
   }
 
   function handleRemoveCategory() {
+
+    if (!netInfo.isConnected) {
+      Alert.alert("You have to be connected to internet to use this feature");
+      return;
+    }
+
     Alert.alert(
       "Warning",
       "Deleting this category will remove any and all transactions of this category. Continue?",
@@ -133,6 +140,7 @@ export default function CreateCategoryScreen({navigation, route}) {
               if (index === querySnapshot.docs.length - 1) {
                 removeCategoryField(id);
               }
+
             })
             .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
         });

@@ -11,6 +11,7 @@ import { RECENT_TRANSACTIONS_TO_SHOW, SHOW_PARALLAX_OBJECTS } from '../data/Cons
 import DEFAULT_CATEGORIES from '../data/DefaultCategories';
 import { lighten } from 'color2k';
 import { groupTransactionsByCategory } from '../../utils/NagaUtils';
+import { StatusBar } from 'react-native';
 
 export default function HomeScreen({navigation}) {
   const insets = useSafeAreaInsets();

@@ -1,7 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faEye, faEyeSlash, faHandshake, faHeart } from '@fortawesome/free-regular-svg-icons';
-import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBasketShopping, faBellConcierge, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGamepad, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faTicket, faTrash, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeftLong, faArrowRightArrowLeft, faArrowTrendUp, faBagShopping, faBarcode, faBars, faBasketShopping, faBellConcierge, faBowlFood, faBurger, faCalculator, faCalendarDays, faChevronDown, faChevronLeft, faChevronRight, faClipboard, faCommentsDollar, faDollarSign, faDumbbell, faEllipsis, faEnvelope, faFileInvoice, faFileInvoiceDollar, faGamepad, faGift, faHandHoldingDollar, faHospital, faHouse, faLandmark, faLaptop, faMoneyBills, faMoneyBillTransfer, faMoneyBillTrendUp, faMoneyCheckDollar, faPencil, faPlus, faShirt, faTaxi, faTicket, faTrash, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 library.add( 
   faBagShopping, faEllipsis, faBars, faPlus, faChevronRight, faDollarSign, faCalendarDays,
@@ -11,7 +11,7 @@ library.add(
   faHandHoldingDollar, faLandmark, faMoneyBills, faMoneyCheckDollar, faCommentsDollar,
   faHospital, faHouse, faUser, faEnvelope, faClipboard, faBarcode, faChevronDown, faTrash,
   faBellConcierge, faTicket, faHandshake, faGamepad, faUsers, faBasketShopping, faGoogle,
-  faApple
+  faApple, faChevronLeft
 );
 
 const ICONS = [

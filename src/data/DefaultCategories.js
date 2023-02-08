@@ -46,7 +46,7 @@ const DEFAULT_CATEGORIES = {
     type: "expenses"
   },
   expense_sport: {
-    color: COLORS.green,
+    color: COLORS.pink,
     icon: "fa-solid fa-dumbbell",
     id: "expense_sport",
     name: "Sport",

@@ -99,7 +99,7 @@ export default function LoginScreen({navigation}) {
     <ScrollView bounces={false} contentContainerStyle={{ flex: 1}}>
       <VStack justifyContent="space-between" w="100%" h="100%" px="4">
         <VStack alignItems="center" justifyContent="center" flex={1} space={5} style={{
-          paddingBottom: Dimensions.get('window').height * 0.1
+
         }}>
           <Text fontWeight="600" fontSize={30} mb="8">LOG IN</Text>
           <Input
@@ -172,15 +172,17 @@ export default function LoginScreen({navigation}) {
           </HStack>
 
         </VStack>
-        <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
-          <TouchableOpacity
-            onPress={handleLogin}
-            disabled={!buttonEnabled}
-          >
-            <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
-              <Text color="white" fontWeight="600" fontSize={16}>LOG IN</Text>
-            </Center>
-          </TouchableOpacity>
+        <Box py="2.5">
+          <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
+            <TouchableOpacity
+              onPress={handleLogin}
+              disabled={!buttonEnabled}
+            >
+              <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
+                <Text color="white" fontWeight="600" fontSize={16}>LOG IN</Text>
+              </Center>
+            </TouchableOpacity>
+          </Box>
         </Box>
       </VStack>
     </ScrollView>

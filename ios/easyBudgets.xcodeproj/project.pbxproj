@@ -584,6 +584,8 @@
 				DEVELOPMENT_TEAM = 36LN6NH5Z7;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = easyBudgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PocketWise;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -612,6 +614,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 36LN6NH5Z7;
 				INFOPLIST_FILE = easyBudgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PocketWise;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

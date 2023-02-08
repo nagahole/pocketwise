@@ -132,21 +132,23 @@ export default function AddBudgetScreen({navigation}) {
           </Box>
         </VStack>
       </ScrollView>
-      <Box style={{ height: 55 }} px="4">
-        <TouchableOpacity
-          disabled={!buttonEnabled}
-          onPress={handleAddBudget} 
-        >
-          <Center 
-            w="100%" 
-            h="100%" 
-            rounded={100} 
-            bg="#6a48fa"
+      <VStack py="2.5">
+        <Box style={{ height: 55 }} px="4">
+          <TouchableOpacity
+            disabled={!buttonEnabled}
+            onPress={handleAddBudget} 
           >
-            <Text color="white" fontWeight="500" fontSize={16}>ADD BUDGET</Text>
-          </Center>
-        </TouchableOpacity>
-      </Box>
+            <Center 
+              w="100%" 
+              h="100%" 
+              rounded={100} 
+              bg="#6a48fa"
+            >
+              <Text color="white" fontWeight="500" fontSize={16}>ADD BUDGET</Text>
+            </Center>
+          </TouchableOpacity>
+        </Box>
+      </VStack>
     </Box>
   )
 }

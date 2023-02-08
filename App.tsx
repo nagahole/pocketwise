@@ -4,8 +4,12 @@ import { NativeBaseProvider } from 'native-base'
 import React from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import BudgetApp from './src/BudgetApp'
+import { StatusBar } from 'react-native';
 
 export default function App() {
+
+  StatusBar.setBarStyle("dark-content", true);
+
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <NavigationContainer>

@@ -3,6 +3,7 @@ import { Text } from "native-base";
 import { useContext, useEffect, useRef } from "react";
 import { Dimensions } from "react-native";
 import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DataContext, RecentTransactionsContext } from "../stacks/MainAppStack";
 
 export default function SplashScreen({navigation}) {
@@ -12,13 +13,15 @@ export default function SplashScreen({navigation}) {
 
   const navigatedOut = useRef(false);
 
+  const insets = useSafeAreaInsets();
+
   useEffect(() => {
     if (data != undefined && recentTransactions != undefined && !navigatedOut.current) {
       navigatedOut.current = true;
       setTimeout(() => navigation.navigate("Main Tab"), 200);
     }
   }, [data, recentTransactions])
-  
+
 
   return (
     <Animated.View
@@ -26,12 +29,13 @@ export default function SplashScreen({navigation}) {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
         backgroundColor: "white",
-        paddingBottom: 60,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        paddingBottom: insets.bottom + 25,
+        paddingTop: insets.top
       }]}
     >
-      <Text fontSize="40" fontWeight="600">Easy Budgets</Text>
+      <Text fontSize="40" fontWeight="600">PocketWise</Text>
     </Animated.View>
   )
 }

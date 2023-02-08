@@ -28,12 +28,12 @@ export default function ExpenseCategoryListItem({
             </Center>
           </AspectRatio>
           <VStack flex={2}>
-            <Text fontWeight="bold" fontSize={16}>{category.name.capitalize()}</Text>
+            <Text fontWeight="600" fontSize={16}>{category.name.capitalize()}</Text>
             <Text color="#999" fontWeight="600" fontSize={12}>{numberOfTransactions} transaction{numberOfTransactions === 1? "" : "s"}</Text>
           </VStack>
           <VStack flex={1} alignItems="flex-end">
             <Text fontWeight="bold" color={ amount === 0? "#bab9bc" : "#e44749"}>
-              -${amount.toFixed(2)}
+              {amount === 0? "" : "-"}${amount.toFixed(2)}
             </Text>
             <Text color="#999">{Math.round(percentageOfTotal)}%</Text>
           </VStack>

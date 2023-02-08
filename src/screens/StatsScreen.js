@@ -1,14 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AspectRatio, Box, Button, Center, FlatList, HStack, Select, Text, VStack } from "native-base";
 import { useContext, useEffect, useRef, useState } from "react";
-import { LayoutAnimation, TouchableOpacity } from "react-native";
+import { LayoutAnimation, StatusBar, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup } from "victory-native";
 import ExpenseCategoryListItem from "../components/ExpenseCategoryListItem";
 import { DataContext, RecentTransactionsContext, startOfTheMonth } from "../stacks/MainAppStack";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { UNITS_TO_GRAPH } from "../data/Constants";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import { Calendar } from "react-native-calendars";
 import moment from "moment";
 import { groupTransactionsByCategory, getExpenseGroupsArr, getDays, groupTransactionsByTime as groupTransactionsByTime, groupTransactionsByTimeToGraphArr } from "../../utils/NagaUtils";
 
@@ -81,6 +81,19 @@ export default function StatsScreen({navigation}) {
 
   }, [allMonthsExpenses, dataContext])
 
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  function toggleCalendar() {
+    LayoutAnimation.configureNext({
+      duration: 300,
+      update: {
+        type: "easeInEaseOut"
+      }
+    });
+
+    setShowCalendar(prev => !prev);
+  }
+
   function getCurrentExpenseData() {
     if (groupBy === "months") return monthlyExpenses
     else if (groupBy === "weeks") return weeklyExpenses
@@ -138,11 +151,11 @@ export default function StatsScreen({navigation}) {
                   {moment().startOf("month").format("MMM D")} - {moment().format("MMM D, YYYY")}
                 </Text>
               </VStack>
-              <TouchableOpacity key="CalendarTouchableOpacity">
+              {/* <TouchableOpacity key="CalendarTouchableOpacity" onPress={toggleCalendar}>
                 <Center borderWidth={1.5} borderColor="#EFEEEE" w="12" h="12" rounded={15}>
                   <FontAwesomeIcon icon="fa-solid fa-calendar-days" color="#7C7B7A" size={18}/>
                 </Center>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </HStack>
             <Box>
               <Select 

@@ -83,8 +83,8 @@ export default function BudgetScreen({navigation}) {
         />
       </Box>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Add Budget")}>
-        <Center w="100%" bg="#6a48fa" rounded={100} position="absolute" bottom="6" style={{ height: 54 }}>
+      <TouchableOpacity onPress={() => navigation.navigate("Add Budget")} style={{ zIndex: 9999 }}>
+        <Center w="100%" bg="#6a48fa" rounded={100} bottom="6" style={{ height: 54 }}>
           <Text fontWeight="600" fontSize="16" color="white">ADD NEW BUDGET</Text>
         </Center>
       </TouchableOpacity>

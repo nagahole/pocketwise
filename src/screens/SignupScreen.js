@@ -143,15 +143,17 @@ export default function SignupScreen({navigation}) {
             )}
           />
         </VStack>
-        <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
-          <TouchableOpacity
-            onPress={handleSignup}
-            disabled={!buttonEnabled}
-          >
-            <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
-              <Text color="white" fontWeight="600" fontSize={16}>SIGN UP</Text>
-            </Center>
-          </TouchableOpacity>
+        <Box py="2.5">
+          <Box style={{ height: 55, opacity: buttonEnabled? 1 : 0.35 }}>
+            <TouchableOpacity
+              onPress={handleSignup}
+              disabled={!buttonEnabled}
+            >
+              <Center w="100%" h="100%" rounded={100} bg="#6a48fa">
+                <Text color="white" fontWeight="600" fontSize={16}>SIGN UP</Text>
+              </Center>
+            </TouchableOpacity>
+          </Box>
         </Box>
       </VStack>
     </ScrollView>

@@ -105,7 +105,7 @@ export default function EditBudgetScreen({navigation, route}) {
         />
       </ScrollView>
 
-      <VStack space={3.5}>
+      <VStack space={3.5} py="2.5">
         <Box style={{ height: 55 }} opacity={buttonEnabled? 1 : 0.3}>
           <TouchableOpacity 
             disabled={!buttonEnabled}

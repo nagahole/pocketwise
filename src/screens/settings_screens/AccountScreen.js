@@ -24,7 +24,7 @@ export default function AccountScreen({navigation}) {
             if (isSignedInWithPassword()) {
               handleDeleteAccountPasswordPrompt();
             } else {
-              handleDeleteAccountEmailPrompt();
+              handleDeleteAccountNoPasswordPrompt();
             }
           }
         }
@@ -32,7 +32,7 @@ export default function AccountScreen({navigation}) {
     );
   }
 
-  function handleDeleteAccountEmailPrompt() {
+  function handleDeleteAccountNoPasswordPrompt() {
     Alert.prompt(
       "Enter \"DELETE\" to confirm (case sensitive)",
       "(There are no further confirmations after this dialogue)",
@@ -44,12 +44,13 @@ export default function AccountScreen({navigation}) {
         {
           text: "Delete",
           style: "destructive",
-          onPress(password) {
-            reauthenticate(password)
-              .then(() => {
-                deleteAccount();
-              })
-              .catch(error => Alert.alert(error.nativeErrorCode, error.nativeErrorMessage?? error.message));
+          onPress(prompt) {
+            if (prompt === "DELETE") {
+              deleteAccount();
+            } else {
+              Alert.alert("Please type in the correct prompt");
+              return;
+            }
           }
         }
       ]

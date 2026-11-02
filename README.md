@@ -53,7 +53,7 @@ The app was published on the **App Store from 9 February 2023 to 24 February 202
 | Framework | [React Native](https://reactnative.dev/) 0.71, React 18 |
 | UI | [NativeBase](https://nativebase.io/), Font Awesome, React Native Vector Icons |
 | Navigation | [React Navigation](https://reactnavigation.org/) 6 (stack, bottom tabs, drawer, top tabs) |
-| Charts | [Victory Native](https://formidable.com/open-source/victory/docs/native/), D3 scales |
+| Charts | [Victory Native](https://github.com/FormidableLabs/victory), D3 scales |
 | Backend | [React Native Firebase](https://rnfirebase.io/): Auth and Cloud Firestore |
 | Lists | [FlashList](https://shopify.github.io/flash-list/) |
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/icon.png" alt="Easy Budgets logo" width="120" />
+<img src="docs/images/icon.png" alt="PocketWise logo" width="120" />
 
 # PocketWise (formerly Easy Budgets)
 

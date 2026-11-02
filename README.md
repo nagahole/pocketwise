@@ -17,6 +17,12 @@ Track spending, set budgets per category, and see where your money goes, without
 
 ---
 
+## Background
+
+Easy Budgets started as a for-fun holiday project in the break between finishing high school at the end of 2022 and starting university in 2023. Every line was written by hand, without AI coding tools.
+
+The app was published on the **App Store from 9 February 2023 to 24 February 2024**. I retired it at the renewal date rather than pay the US$99/year Apple Developer membership as an undergrad.
+
 ## Screenshots
 
 <p align="center">

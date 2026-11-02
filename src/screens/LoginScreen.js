@@ -41,10 +41,8 @@ export default function LoginScreen({navigation}) {
 
     auth()
       .signInWithEmailAndPassword(email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log("Logged in with", user.email); 
-        setButtonEnabled(true);       
+      .then(() => {
+        setButtonEnabled(true);
       })
       .catch(error => { 
         setButtonEnabled(true);

@@ -199,7 +199,6 @@ export default function AddTransactionScreen({navigation}) {
 
   function handleConfirmDatePicker(date) {
     setDate(date.toString());
-    console.log(date);
     hideDatePicker();
   }
 
